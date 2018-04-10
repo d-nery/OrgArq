@@ -3,8 +3,8 @@
     .globl __start
 
 __start:
-    addiu   $t0, $0, 3
-    addiu   $t1, $0, 4
+    li      $t0, 3
+    li      $t1, 4
     addu    $t2, $t0, $t1
     sll     $t3, $t2, 2
 
