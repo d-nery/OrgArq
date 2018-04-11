@@ -1,4 +1,4 @@
-# Teste sort
+# Teste sort s
 
 # System calls
 PRINT_INT    = 1    # $a0 = int
