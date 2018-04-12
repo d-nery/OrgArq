@@ -88,7 +88,7 @@ k_loop: beq $t2, $s4, k_end #Termina k_loop se k = linhas de matrizB
         sw $t9, 0($t6)
 
         # Imprime elementos da matriz resultado[i][j] no console
-        addiu $a0, $zero, $t9 # Carrega a0 com o int a ser mostrado
+        addu $a0, $zero, $t9 # Carrega a0 com o int a ser mostrado
         addiu $v0, $zero, 1 # Carrega v0 com syscall 1 = print_int
         syscall 
 
