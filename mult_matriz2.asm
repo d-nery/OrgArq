@@ -1,8 +1,14 @@
-## Multiplicacao de Matrizes
-# Recebe matrizes A(mxn) e B(nxp)
-# Realiza a multiplicacao e guarda em C(mxp)
+## matrix_multiplication.asm
+# Organização e Arquitetura de Computadores I
+# Escola Politécnica da USP
 #
-# Algoritmo base:
+# Author: Daniel Nery Silva de Oliveira
+#         Beatriz de Oliveira Silva
+#
+# Inputs: A(mxn) e B(nxp)
+# Output: C(mxp)
+#
+# Base algorithm:
 # for i = 1 to m
 #     for j = 1 to p:
 #         sum = 0
@@ -26,7 +32,7 @@ n:      .word   4
 p:      .word   5
 
 space:  .asciiz " "
-enter:  .asciiz "\n"
+LF:     .asciiz "\n"
 
 .text
 .globl main
@@ -118,7 +124,7 @@ print_o_loop:
         bne     $t1, $s2, print_i_loop
         nop
 
-    la      $a0, enter
+    la      $a0, LF
     li      $v0, PRINT_STRING
     syscall
 

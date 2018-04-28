@@ -13,8 +13,8 @@
 #             swapped = true
 # while swapped
 #
-# Tested with QtSpim 9.1.20 with Bare Machine configuration
-# (Delayed branches and delayed loads)
+# Tested with QtSpim 9.1.20 with
+# Delayed branches and delayed loads
 ##
 
 # System calls
@@ -96,5 +96,5 @@ print_loop:
     nop
 
 end:
-    li $v0, EXIT
+    li      $v0, EXIT
     syscall
