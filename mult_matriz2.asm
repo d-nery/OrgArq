@@ -41,9 +41,9 @@ main:
     la      $t0, m
     la      $t1, n
     la      $t2, p
-    lw		$s0, 0($t0)         # s0 = m
-    lw		$s1, 0($t1)         # s1 = n
-    lw		$s2, 0($t2)         # s2 = p
+    lw      $s0, 0($t0)         # s0 = m
+    lw      $s1, 0($t1)         # s1 = n
+    lw      $s2, 0($t2)         # s2 = p
 
     la      $s3, A              # s3 -> matriz A
     la      $s4, B              # s4 -> matriz B
@@ -61,15 +61,15 @@ j_loop:
     li      $t2, 0              # t2 = k = 0
 
 k_loop:
-    mult	$t0, $s1			#
-    mflo	$t7					# t7 = i * n
+    mult    $t0, $s1            #
+    mflo    $t7                 # t7 = i * n
     add     $t7, $t7, $t2       # t7 = i * n + k
     sll     $t7, $t7, 2         # t7 * 4 (bytes)
 
     add     $t3, $s3, $t7       # t3 = A[i][k]
 
-    mult	$t2, $s2			#
-    mflo	$t7					# t7 = k * p
+    mult    $t2, $s2            #
+    mflo    $t7                 # t7 = k * p
     add     $t7, $t7, $t1       # t7 = k * p + j
     sll     $t7, $t7, 2         # t7 * 4 (bytes)
 
@@ -78,8 +78,8 @@ k_loop:
     lw      $t7, ($t3)
     lw      $t8, ($t4)
 
-    mult	$t7, $t8			#
-    mflo	$t7					# t7 = A[i][k] * B[k][j]
+    mult    $t7, $t8            #
+    mflo    $t7                 # t7 = A[i][k] * B[k][j]
 
     add     $t6, $t6, $t7       # sum = sum + A[i][j] * B[k][j]
 
@@ -87,19 +87,19 @@ k_loop:
     bne     $t2, $s1, k_loop   # se k != n, continua no loop
 
     ## End j_loop
-    mult	$t0, $s2			#
-    mflo	$t7					# t7 = i * p
+    mult    $t0, $s2            #
+    mflo    $t7                 # t7 = i * p
     add     $t7, $t7, $t1       # t7 = i * p + j
     sll     $t7, $t7, 2         # t7 * 4 (bytes)
 
     add     $t5, $s5, $t7
-    sw		$t6, ($t5)
+    sw      $t6, ($t5)
 
     addi    $t1, $t1, 1         # j++
     bne     $t1, $s2, j_loop    # se j != p, continua no loop
 
     ## End k_loop
-    addi	$t0, $t0, 1 		# i++
+    addi    $t0, $t0, 1         # i++
     bne     $t0, $s0, i_loop    # se i != m, continua no loop
 
 print:
@@ -120,7 +120,7 @@ print_o_loop:
         syscall
 
         addi    $s1, $s1, 4
-        addi	$t1, $t1, 1			# j++
+        addi    $t1, $t1, 1         # j++
         bne     $t1, $s2, print_i_loop
         nop
 
@@ -128,7 +128,7 @@ print_o_loop:
     li      $v0, PRINT_STRING
     syscall
 
-    addi	$t0, $t0, 1			# i++
+    addi    $t0, $t0, 1         # i++
     bne     $t0, $s0, print_o_loop # se i != m, continua imprimindo
 
 
