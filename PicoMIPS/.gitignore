@@ -1,10 +1,27 @@
-db/
-incremental_db/
-output_files/
-simulation/
+# Aldec ActiveHDL .gitignore
+# Sergey Kostyuk, 2017, Public Domain
 
-*.txt
-*.vwf
-*.rpt
-*.qar
-*.qarlog
+*.asdb/
+log/
+Edfmap.ini
+*.wsp
+*.wsf
+*.log
+*.erf
+*.sth
+*.cmd
+compile/
+*.set
+
+# Comment to save compilation order:
+compilation.order
+projlib.cfg
+library.cfg
+*.lib
+*.mgf
+
+# Uncomment to ignore simulation results
+*.awc
+*.asdb
+synthesis.order
+synthesis/
