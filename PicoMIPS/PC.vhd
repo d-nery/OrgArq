@@ -11,16 +11,19 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 
+library work;
+use work.constants.all;
+
 entity PC is
     port (
         clk:             in  std_logic;
-        new_address:     in  std_logic_vector(31 downto 0);
-        current_address: out std_logic_vector(31 downto 0)
+        new_address:     in  reg_t;
+        current_address: out reg_t
     );
 end PC;
 
 architecture PC_arch of PC is
-    signal address: std_logic_vector(31 downto 0) := (others => '0');
+    signal address: reg_t := (others => '0');
 begin
     load_address: process (clk)
     begin

@@ -15,6 +15,6 @@ Alunos:
 * João Raphael de Souza Morales - 9012858
 
 Pastas:
-* PicoMIPS -> Projeto em VHDL do Quartus Lite
+* PicoMIPS -> Projeto em VHDL 08 testado com GHDL
 * Diagramas -> Diagramas relacionados ao projeto
 * Assemblies -> Programas asm de testes para o simulador QtSPIM
