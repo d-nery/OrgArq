@@ -3,7 +3,7 @@ GHDL := ghdl
 WORKDIR := work
 VERSION := 08
 
-PACKAGES := pkgConstants.vhd
+PACKAGES :=  pkgTypes.vhd pkgConstants.vhd # Manter essa ordem pq Constants usa types
 TARGETS := $(filter-out $(PACKAGES), $(wildcard *.vhd) $(wildcard */*.vhd))
 
 DEBUG := 1
@@ -36,6 +36,10 @@ ri_test:
 
 ula_test:
 	$(GHDL) -r $(GHDLFLAGS) ULA_tb --vcd=$(WORKDIR)/$@.vcd
+	gtkwave $(WORKDIR)/$@.vcd
+
+instructions_test:
+	$(GHDL) -r $(GHDLFLAGS) instruction_fetch_tb --vcd=$(WORKDIR)/$@.vcd
 	gtkwave $(WORKDIR)/$@.vcd
 
 check_syntax: | $(WORKDIR)

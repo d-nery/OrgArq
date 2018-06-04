@@ -12,28 +12,28 @@ use IEEE.numeric_std.all;
 
 library work;
 use work.constants.all;
+use work.types.all;
 
 entity ULA is
     port (
-        in1, in2: in  vec32_t;
-        control:  in  std_logic_vector(3 downto 0);
-        result:   out vec32_t;
+        in1, in2: in  word_t;
+        control:  in  nibble_t;
+
+        result:   out word_t;
         zero:     out std_logic
     );
-end ULA;
+end entity ULA;
 
 architecture ULA_arch of ULA is
+    signal s_result: word_t;
 begin
-    result <= std_logic_vector(unsigned(in1)  +  unsigned(in2)) when control = ULA_ADD                        else
-              std_logic_vector(unsigned(in1)  -  unsigned(in2)) when control = ULA_SUB or control = ULA_SUBNE else
-              in1 and in2                                       when control = ULA_AND                        else
-              in1 or  in2                                       when control = ULA_OR                         else
-              std_logic_vector(to_unsigned(1, 32))              when control = ULA_SLT and in1 < in2          else
-              (others => '0')                                   when control = ULA_SLT;
+    s_result <= std_logic_vector(signed(in1)  +  signed(in2)) when control = ULA_ADD               else
+                std_logic_vector(signed(in1)  -  signed(in2)) when control = ULA_SUB               else
+                in1 and in2                                   when control = ULA_AND               else
+                in1 or  in2                                   when control = ULA_OR                else
+                x"00000001"                                   when control = ULA_SLT and in1 < in2 else
+                x"00000000"                                   when control = ULA_SLT;
 
-    zero <= '1' when in1 /= in2 and control = ULA_SUBNE else
-            '0' when in1 =  in2 and control = ULA_SUBNE else
-            '1' when in1 =  in2                         else
-            '0';
-
-end ULA_arch;
+    zero   <= '1' when s_result = x"00000000" else '0';
+    result <= s_result;
+end architecture ULA_arch;

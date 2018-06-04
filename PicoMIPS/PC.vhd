@@ -13,17 +13,18 @@ use IEEE.std_logic_1164.all;
 
 library work;
 use work.constants.all;
+use work.types.all;
 
 entity PC is
     port (
         clk:             in  std_logic;
-        new_address:     in  reg_t;
-        current_address: out reg_t
+        new_address:     in  word_t;
+        current_address: out word_t
     );
-end PC;
+end entity PC;
 
 architecture PC_arch of PC is
-    signal address: reg_t := (others => '0');
+    signal address: word_t := (others => '0');
 begin
     load_address: process (clk)
     begin
@@ -33,4 +34,4 @@ begin
     end process load_address;
 
     current_address <= address;
-end PC_arch;
+end architecture PC_arch;

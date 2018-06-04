@@ -18,26 +18,27 @@ use IEEE.numeric_std.all;
 
 library work;
 use work.constants.all;
+use work.types.all;
 
 entity register_bank is
     port (
         clk:         in  std_logic;
         is_write:    in  std_logic;
 
-        write_index: in  std_logic_vector(2 downto 0);
+        write_index: in  nibble_t;
 
-        read_index1:  in  std_logic_vector(2 downto 0);
-        read_index2:  in  std_logic_vector(2 downto 0);
+        read_index1: in  nibble_t;
+        read_index2: in  nibble_t;
 
-        write_data:  in  reg_t;
+        write_data:  in  word_t;
 
-        read_data1:   out reg_t;
-        read_data2:   out reg_t
+        read_data1:  out word_t;
+        read_data2:  out word_t
     );
-end register_bank;
+end entity register_bank;
 
 architecture register_bank_arch of register_bank is
-    type reg_array is array(0 to 7) of reg_t;
+    type reg_array is array(0 to 7) of word_t;
     signal registers: reg_array := (others => (others => '0'));
 begin
     sync_write: process (clk)
@@ -49,4 +50,4 @@ begin
 
     read_data1 <= registers(to_integer(unsigned(read_index1)));
     read_data2 <= registers(to_integer(unsigned(read_index2)));
-end register_bank_arch;
+end architecture register_bank_arch;

@@ -7,26 +7,18 @@ use IEEE.numeric_std.all;
 
 library work;
 use work.constants.all;
+use work.types.all;
 
 entity ULA_tb is
-end ULA_tb;
+end entity ULA_tb;
 
 architecture ULA_tb_arch of ULA_tb is
-    component ULA is
-        port (
-            in1, in2: in  vec32_t;
-            control:  in  std_logic_vector(3 downto 0);
-            result:   out vec32_t;
-            zero:     out std_logic
-        );
-    end component ULA;
-
-    signal in1, in2: vec32_t;
-    signal control:  std_logic_vector(3 downto 0);
-    signal result:   vec32_t;
+    signal in1, in2: word_t;
+    signal control:  nibble_t;
+    signal result:   word_t;
     signal zero:     std_logic;
 begin
-    ULA0: ULA port map (
+    ULA0: entity work.ULA port map (
         in1     => in1,
         in2     => in2,
         control => control,
@@ -35,28 +27,28 @@ begin
     );
 
     process
-        type ULA_control_array is array (natural range <>) of std_logic_vector(3 downto 0);
-        type operand_array is array (natural range <>) of vec32_t;
+        type ULA_control_array is array (natural range <>) of nibble_t;
+        type operand_array is array (natural range <>) of word_t;
 
         -- Operacoes geradas aleatoriamente
         constant operations: ULA_control_array := (
-            ULA_AND,   ULA_SUBNE, ULA_AND,   ULA_SUB,   ULA_OR,    ULA_SLT,   ULA_AND,   ULA_AND,   ULA_SLT,   ULA_ADD,   ULA_SUB,   ULA_AND,   ULA_SLT,   ULA_SUB,   ULA_AND,
-            ULA_ADD,   ULA_SLT,   ULA_AND,   ULA_ADD,   ULA_ADD,   ULA_OR,    ULA_AND,   ULA_SLT,   ULA_SLT,   ULA_SUB,   ULA_ADD,   ULA_ADD,   ULA_SUB,   ULA_SUB,   ULA_SUBNE,
-            ULA_SLT,   ULA_ADD,   ULA_SUB,   ULA_ADD,   ULA_OR,    ULA_OR,    ULA_ADD,   ULA_SUB,   ULA_SLT,   ULA_ADD,   ULA_SUB,   ULA_SUB,   ULA_OR,    ULA_AND,   ULA_SLT,
-            ULA_AND,   ULA_SUB,   ULA_AND,   ULA_SLT,   ULA_SUBNE, ULA_SUB,   ULA_SUB,   ULA_SUB,   ULA_AND,   ULA_AND,   ULA_OR,    ULA_SUB,   ULA_ADD,   ULA_SLT,   ULA_SUB,
-            ULA_AND,   ULA_SLT,   ULA_OR,    ULA_SUBNE, ULA_SUB,   ULA_AND,   ULA_OR,    ULA_ADD,   ULA_SUBNE, ULA_SUBNE, ULA_SLT,   ULA_SUBNE, ULA_OR,    ULA_SLT,   ULA_OR,
-            ULA_OR,    ULA_SUB,   ULA_AND,   ULA_AND,   ULA_OR,    ULA_SLT,   ULA_OR,    ULA_SUB,   ULA_SLT,   ULA_SUB,   ULA_SUBNE, ULA_SUBNE, ULA_SUB,   ULA_SUB,   ULA_SUBNE,
-            ULA_SUBNE, ULA_OR,    ULA_SLT,   ULA_AND,   ULA_SUB,   ULA_SUBNE, ULA_SLT,   ULA_AND,   ULA_ADD,   ULA_SUBNE, ULA_SUBNE, ULA_SLT,   ULA_AND,   ULA_SUB,   ULA_SUB,
-            ULA_AND,   ULA_SUB,   ULA_SUB,   ULA_SLT,   ULA_OR,    ULA_SUB,   ULA_SUB,   ULA_SUBNE, ULA_OR,    ULA_OR,    ULA_SLT,   ULA_SUB,   ULA_ADD,   ULA_SLT,   ULA_SLT,
-            ULA_AND,   ULA_SLT,   ULA_SLT,   ULA_OR,    ULA_SUBNE, ULA_OR,    ULA_SUBNE, ULA_ADD,   ULA_OR,    ULA_SUB,   ULA_AND,   ULA_ADD,   ULA_OR,    ULA_OR,    ULA_OR,
-            ULA_SLT,   ULA_SUBNE, ULA_AND,   ULA_ADD,   ULA_ADD,   ULA_ADD,   ULA_ADD,   ULA_SLT,   ULA_AND,   ULA_ADD,   ULA_SUBNE, ULA_OR,    ULA_AND,   ULA_ADD,   ULA_AND,
-            ULA_SLT,   ULA_OR,    ULA_SUBNE, ULA_AND,   ULA_OR,    ULA_SUB,   ULA_ADD,   ULA_SLT,   ULA_SUB,   ULA_AND,   ULA_AND,   ULA_SLT,   ULA_OR,    ULA_OR,    ULA_SLT,
-            ULA_SUBNE, ULA_SUBNE, ULA_SUB,   ULA_OR,    ULA_SUB,   ULA_ADD,   ULA_SUBNE, ULA_SUB,   ULA_OR,    ULA_SUB,   ULA_ADD,   ULA_OR,    ULA_SUB,   ULA_SUB,   ULA_OR,
-            ULA_SUBNE, ULA_OR,    ULA_OR,    ULA_ADD,   ULA_OR,    ULA_SUB,   ULA_OR,    ULA_ADD,   ULA_SLT,   ULA_SUB,   ULA_SLT,   ULA_ADD,   ULA_AND,   ULA_SLT,   ULA_SLT,
-            ULA_AND,   ULA_SUB,   ULA_SUB,   ULA_SUB,   ULA_ADD,   ULA_SLT,   ULA_AND,   ULA_OR,    ULA_ADD,   ULA_SUB,   ULA_SLT,   ULA_AND,   ULA_ADD,   ULA_SUBNE, ULA_SUBNE,
-            ULA_SUBNE, ULA_SUBNE, ULA_SUB,   ULA_ADD,   ULA_SUB,   ULA_SUB,   ULA_SUBNE, ULA_ADD,   ULA_OR,    ULA_AND,   ULA_SUBNE, ULA_AND,   ULA_ADD,   ULA_SUBNE, ULA_SLT,
-            ULA_AND,   ULA_OR,    ULA_ADD,   ULA_ADD,   ULA_SLT,   ULA_SLT,   ULA_SLT,   ULA_ADD,   ULA_ADD,   ULA_ADD,   ULA_AND,   ULA_SLT,   ULA_SUB,   ULA_SUBNE, ULA_SUB,
-            ULA_ADD,   ULA_SUBNE, ULA_AND,   ULA_AND,   ULA_OR,    ULA_SUBNE, ULA_OR,    ULA_ADD,   ULA_SUBNE, ULA_SLT,   ULA_SUBNE, ULA_ADD,   ULA_SUBNE, ULA_SLT,   ULA_SUBNE
+            ULA_AND, ULA_SUB, ULA_AND, ULA_SUB, ULA_OR,  ULA_SLT, ULA_AND, ULA_AND, ULA_SLT, ULA_ADD, ULA_SUB, ULA_AND, ULA_SLT, ULA_SUB, ULA_AND,
+            ULA_ADD, ULA_SLT, ULA_AND, ULA_ADD, ULA_ADD, ULA_OR,  ULA_AND, ULA_SLT, ULA_SLT, ULA_SUB, ULA_ADD, ULA_ADD, ULA_SUB, ULA_SUB, ULA_SUB,
+            ULA_SLT, ULA_ADD, ULA_SUB, ULA_ADD, ULA_OR,  ULA_OR,  ULA_ADD, ULA_SUB, ULA_SLT, ULA_ADD, ULA_SUB, ULA_SUB, ULA_OR,  ULA_AND, ULA_SLT,
+            ULA_AND, ULA_SUB, ULA_AND, ULA_SLT, ULA_SUB, ULA_SUB, ULA_SUB, ULA_SUB, ULA_AND, ULA_AND, ULA_OR,  ULA_SUB, ULA_ADD, ULA_SLT, ULA_SUB,
+            ULA_AND, ULA_SLT, ULA_OR,  ULA_SUB, ULA_SUB, ULA_AND, ULA_OR,  ULA_ADD, ULA_SUB, ULA_SUB, ULA_SLT, ULA_SUB, ULA_OR,  ULA_SLT, ULA_OR,
+            ULA_OR,  ULA_SUB, ULA_AND, ULA_AND, ULA_OR,  ULA_SLT, ULA_OR,  ULA_SUB, ULA_SLT, ULA_SUB, ULA_SUB, ULA_SUB, ULA_SUB, ULA_SUB, ULA_SUB,
+            ULA_SUB, ULA_OR,  ULA_SLT, ULA_AND, ULA_SUB, ULA_SUB, ULA_SLT, ULA_AND, ULA_ADD, ULA_SUB, ULA_SUB, ULA_SLT, ULA_AND, ULA_SUB, ULA_SUB,
+            ULA_AND, ULA_SUB, ULA_SUB, ULA_SLT, ULA_OR,  ULA_SUB, ULA_SUB, ULA_SUB, ULA_OR,  ULA_OR,  ULA_SLT, ULA_SUB, ULA_ADD, ULA_SLT, ULA_SLT,
+            ULA_AND, ULA_SLT, ULA_SLT, ULA_OR,  ULA_SUB, ULA_OR,  ULA_SUB, ULA_ADD, ULA_OR,  ULA_SUB, ULA_AND, ULA_ADD, ULA_OR,  ULA_OR,  ULA_OR,
+            ULA_SLT, ULA_SUB, ULA_AND, ULA_ADD, ULA_ADD, ULA_ADD, ULA_ADD, ULA_SLT, ULA_AND, ULA_ADD, ULA_SUB, ULA_OR,  ULA_AND, ULA_ADD, ULA_AND,
+            ULA_SLT, ULA_OR,  ULA_SUB, ULA_AND, ULA_OR,  ULA_SUB, ULA_ADD, ULA_SLT, ULA_SUB, ULA_AND, ULA_AND, ULA_SLT, ULA_OR,  ULA_OR,  ULA_SLT,
+            ULA_SUB, ULA_SUB, ULA_SUB, ULA_OR,  ULA_SUB, ULA_ADD, ULA_SUB, ULA_SUB, ULA_OR,  ULA_SUB, ULA_ADD, ULA_OR,  ULA_SUB, ULA_SUB, ULA_OR,
+            ULA_SUB, ULA_OR,  ULA_OR,  ULA_ADD, ULA_OR,  ULA_SUB, ULA_OR,  ULA_ADD, ULA_SLT, ULA_SUB, ULA_SLT, ULA_ADD, ULA_AND, ULA_SLT, ULA_SLT,
+            ULA_AND, ULA_SUB, ULA_SUB, ULA_SUB, ULA_ADD, ULA_SLT, ULA_AND, ULA_OR,  ULA_ADD, ULA_SUB, ULA_SLT, ULA_AND, ULA_ADD, ULA_SUB, ULA_SUB,
+            ULA_SUB, ULA_SUB, ULA_SUB, ULA_ADD, ULA_SUB, ULA_SUB, ULA_SUB, ULA_ADD, ULA_OR,  ULA_AND, ULA_SUB, ULA_AND, ULA_ADD, ULA_SUB, ULA_SLT,
+            ULA_AND, ULA_OR,  ULA_ADD, ULA_ADD, ULA_SLT, ULA_SLT, ULA_SLT, ULA_ADD, ULA_ADD, ULA_ADD, ULA_AND, ULA_SLT, ULA_SUB, ULA_SUB, ULA_SUB,
+            ULA_ADD, ULA_SUB, ULA_AND, ULA_AND, ULA_OR,  ULA_SUB, ULA_OR,  ULA_ADD, ULA_SUB, ULA_SLT, ULA_SUB, ULA_ADD, ULA_SUB, ULA_SLT, ULA_SUB
         );
 
         constant operands1: operand_array := (
@@ -131,8 +123,7 @@ begin
                 report "Error!"
                 severity error;
         end loop;
-
-        assert false report "End of ULA testbench" severity note;
+        report "End of ULA testbench";
         wait;
     end process;
-end ULA_tb_arch;
+end architecture ULA_tb_arch;

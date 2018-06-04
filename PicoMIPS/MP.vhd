@@ -16,6 +16,7 @@ use STD.textio.all;
 
 library work;
 use work.constants.all;
+use work.types.all;
 
 entity MP is
     generic (
@@ -23,13 +24,12 @@ entity MP is
         Tread: in time := 50 ns
     );
     port (
-        address: in  reg_t;
-        data:    out reg_t
+        address: in  word_t;
+        data:    out word_t
     );
-end MP;
+end entity MP;
 
 architecture MP_arch of MP is
-
     -- Funcao que carrega um arquivo txt de memoria
     -- Formato:
     --     [END] [Numero de Words] [Comentarios]
@@ -39,12 +39,12 @@ architecture MP_arch of MP is
 
         variable buff: line;
 
-        variable address_v:      reg_t;
-        variable data_v:         reg_t;
-        variable count:          integer := 0;
-        variable it:             integer := 0;
+        variable address_v:   word_t;
+        variable data_v:      word_t;
+        variable count:       integer := 0;
+        variable it:          integer := 0;
 
-        variable temp_memory:    memory_t := (others => (others => '0'));
+        variable temp_memory: memory_t := (others => (others => '0'));
     begin
         while not endfile(fp) loop
             -- Le primeira linha
@@ -66,7 +66,5 @@ architecture MP_arch of MP is
     constant main_memory: memory_t := parse_mp(filename => filen);
 
 begin
-    --
     data <= main_memory(to_integer(unsigned(address))) after Tread;
-
-end MP_arch;
+end architecture MP_arch;

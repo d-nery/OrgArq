@@ -6,31 +6,24 @@ use IEEE.numeric_std.all;
 
 library work;
 use work.constants.all;
+use work.types.all;
 
 entity PC_tb is
-end PC_tb;
+end entity PC_tb;
 
 architecture PC_tb_arch of PC_tb is
-    component PC is
-        port (
-            clk:             in  std_logic;
-            new_address:     in  reg_t;
-            current_address: out reg_t
-        );
-    end component PC;
-
     signal clk : std_logic := '0';
-    signal new_address : reg_t;
-    signal current_address : reg_t;
+    signal new_address : word_t;
+    signal current_address : word_t;
 begin
-    PC0: PC port map (
+    PC0: entity work.PC port map (
         clk => clk,
         new_address => new_address,
         current_address => current_address
     );
 
     process
-        type address_range is array (natural range <>) of reg_t;
+        type address_range is array (natural range <>) of word_t;
         constant addresses: address_range := (
             x"A1B2C3D4", x"E5F6AA14", x"12A58EDF", x"36485121", x"ABCDEF12", x"00000000",
             x"FFFFFFFF", x"ABCE65F8", x"9415FC25", x"14A5C1E2", x"FF59A51C", x"20000FE5",
@@ -45,7 +38,7 @@ begin
                 report "Error on PC assertion"
                 severity error;
         end loop;
-        assert false report "End of PC testbench" severity note;
+        report "End of PC testbench";
         wait;
     end process;
 
@@ -57,4 +50,4 @@ begin
         end loop;
         wait;
     end process clock_gen;
-end PC_tb_arch;
+end architecture PC_tb_arch;

@@ -7,25 +7,16 @@ use IEEE.numeric_std.all;
 
 library work;
 use work.constants.all;
+use work.types.all;
 
 entity MP_tb is
-end MP_tb;
+end entity MP_tb;
 
 architecture MP_tb_arch of MP_tb is
-    component MP is
-        generic (
-            filen: in string
-        );
-        port (
-            address: in  reg_t;
-            data:    out reg_t
-        );
-    end component MP;
-
-    signal address: reg_t;
-    signal data: reg_t;
+    signal address: word_t;
+    signal data: word_t;
 begin
-    MP0: MP generic map (
+    MP0: entity work.MP generic map (
         filen => "mp_teste.txt"
     ) port map (
         address => address,
@@ -33,7 +24,7 @@ begin
     );
 
     process
-        type address_range is array (natural range <>) of reg_t;
+        type address_range is array (natural range <>) of word_t;
         constant addresses: address_range := (
             x"00000000", x"00000001", x"00000002", x"00000003", x"00000004", x"00000005",
             x"00000010", x"00000011", x"00000012", x"00000013", x"00000014", x"00000015"
@@ -52,7 +43,7 @@ begin
                 report "Error on MP assertion"
                 severity error;
         end loop;
-        assert false report "End of MP testbench" severity note;
+        report "End of MP testbench";
         wait;
     end process;
-end MP_tb_arch;
+end architecture MP_tb_arch;
