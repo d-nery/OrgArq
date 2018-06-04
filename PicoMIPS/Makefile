@@ -3,8 +3,10 @@ GHDL := ghdl
 WORKDIR := work
 VERSION := 08
 
-PACKAGES :=  pkgTypes.vhd pkgConstants.vhd # Manter essa ordem pq Constants usa types
-TARGETS := $(filter-out $(PACKAGES), $(wildcard *.vhd) $(wildcard */*.vhd))
+PACKAGES := pkgTypes.vhd pkgConstants.vhd # Manter essa ordem pq Constants usa types
+TARGETS  := add4.vhd MP.vhd mux2.vhd mux3.vhd register_bank.vhd PC.vhd RI.vhd sign_extend.vhd ULA.vhd ICache.vhd UC.vhd FD.vhd
+
+TARGETS += $(wildcard */*.vhd)
 
 DEBUG := 1
 

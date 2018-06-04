@@ -38,7 +38,68 @@ entity UC is
 end entity UC;
 
 architecture UC_arch of UC is
+    type estado_t is (INICIO, R, ADDI, BEQ, BNE, JUMP, LW, SW);
 
+    signal estado_atual: estado_t := INICIO;
+    signal prox_estado:  estado_t := INICIO;
+    signal we: std_logic := '0';
 begin
+    -- estado seguinte
+    cycle: process (clk, rst)
+    begin
+        if rst = '1' then
+            estado_atual <= INICIO;
+        elsif rising_edge(clk) then
+            estado_atual <= prox_estado;
+        end if;
+    end process cycle;
 
+    -- Funcao combinatoria
+    state: process (opcode, funct, ula_zero)
+    begin
+        case opcode is
+            when OP_R    => prox_estado <= R;
+            when OP_ADDI => prox_estado <= ADDI;
+            when OP_BEQ  => prox_estado <= BEQ;
+            when OP_BNE  => prox_estado <= BNE;
+            when OP_J    => prox_estado <= JUMP;
+            when OP_LW   => prox_estado <= LW;
+            when OP_SW   => prox_estado <= SW;
+            when others  => prox_estado <= INICIO;
+        end case;
+    end process state;
+
+    with estado_atual select
+        mux_regdest <= '1' when R,
+                        '0' when others;
+
+    with estado_atual select
+        mux_memtoreg <= '1' when LW,
+                        '0' when others;
+
+    with estado_atual select
+        mux_ulasrc <= '1' when ADDI | LW | SW,
+                      '0' when others;
+
+    with estado_atual select
+        reg_write <= '1' when R | ADDI| LW,
+                     '0' when others;
+
+    with estado_atual select
+        dmem_enable <= '0' when INICIO,
+                      '1' when others;
+
+    with estado_atual select
+        dmem_rw <= '1' when SW,
+                   '0' when others;
+
+    -- with estado_atual select
+    --     mux_newPC <= "00" when INICIO,
+    --                  "11" when others;
+
+    -- with estado_atual select
+    --     ula_op <= "0000" when INICIO,
+    --               "0001" when others;
+
+    dmem_rw <= not clk and we;
 end architecture UC_arch;

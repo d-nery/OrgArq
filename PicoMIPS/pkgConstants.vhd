@@ -17,21 +17,21 @@ package constants is
     constant REGISTER_WIDTH: integer := 32;
 
     -- Instructions
-    constant OP_J:    integer := 02;
-    constant OP_JAL:  integer := 03;
-    constant OP_BEQ:  integer := 04;
-    constant OP_BNE:  integer := 05;
-    constant OP_ADDI: integer := 08;
-    constant OP_SLTI: integer := 10;
-    constant OP_LW:   integer := 35;
-    constant OP_SW:   integer := 43;
+    constant OP_J:    std_logic_vector(5 downto 0) := "000010";
+    constant OP_JAL:  std_logic_vector(5 downto 0) := "000011";
+    constant OP_BEQ:  std_logic_vector(5 downto 0) := "000100";
+    constant OP_BNE:  std_logic_vector(5 downto 0) := "000101";
+    constant OP_ADDI: std_logic_vector(5 downto 0) := "001000";
+    constant OP_SLTI: std_logic_vector(5 downto 0) := "001010";
+    constant OP_LW:   std_logic_vector(5 downto 0) := "100011";
+    constant OP_SW:   std_logic_vector(5 downto 0) := "101011";
 
-    constant OP_R:      integer := 00;
-    constant FUNC_SLL:  integer := 00;
-    constant FUNC_JR:   integer := 08;
-    constant FUNC_ADD:  integer := 32;
-    constant FUNC_ADDU: integer := 33;
-    constant FUNC_SLT:  integer := 42;
+    constant OP_R:      std_logic_vector(5 downto 0) := "000000";
+    constant FUNC_SLL:  std_logic_vector(5 downto 0) := "000000";
+    constant FUNC_JR:   std_logic_vector(5 downto 0) := "001000";
+    constant FUNC_ADD:  std_logic_vector(5 downto 0) := "100000";
+    constant FUNC_ADDU: std_logic_vector(5 downto 0) := "100001";
+    constant FUNC_SLT:  std_logic_vector(5 downto 0) := "101010";
 
     -- ULA Operations
     constant ULA_AND: nibble_t := "0000";
