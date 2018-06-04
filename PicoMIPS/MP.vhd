@@ -1,6 +1,6 @@
 -- PCS3412 - Organizacao e Arquitetura de Computadores I
 -- PicoMIPS
--- File: memoria_principal.vhd
+-- File: MP.vhd
 -- Author: Daniel Nery Silva de Oliveira
 --
 -- Description:

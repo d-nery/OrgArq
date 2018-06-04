@@ -1,5 +1,10 @@
--- Tesbench
--- ULA
+-- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PicoMIPS
+-- File: ULA_tb.vhd
+-- Author: Daniel Nery Silva de Oliveira
+--
+-- Description:
+--     Testbench para a Unidade Logico-Aritimetica
 
 library IEEE;
 use IEEE.std_logic_1164.all;

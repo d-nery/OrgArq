@@ -1,3 +1,12 @@
+# PCS3412 - Organizacao e Arquitetura de Computadores I
+# PicoMIPS
+# File:gerador_teste_ula.py
+# Author: Daniel Nery Silva de Oliveira
+#
+# Description:
+#     Gerador de numeros aleatorios para
+#     o testbench da ULA
+
 from random import randint, choice
 from ctypes import c_uint
 

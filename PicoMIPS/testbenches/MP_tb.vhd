@@ -1,5 +1,10 @@
--- Tesbench
--- Memoria Principal
+-- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PicoMIPS
+-- File: MP_tb.vhd
+-- Author: Daniel Nery Silva de Oliveira
+--
+-- Description:
+--     Testbench para a Memoria Principal
 
 library IEEE;
 use IEEE.std_logic_1164.all;

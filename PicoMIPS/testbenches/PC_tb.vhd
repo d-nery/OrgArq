@@ -1,4 +1,10 @@
--- PC testbench
+-- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PicoMIPS
+-- File: PC_tb.vhd
+-- Author: Daniel Nery Silva de Oliveira
+--
+-- Description:
+--     Testbench para a Contador de Instrucoes
 
 library IEEE;
 use IEEE.std_logic_1164.all;

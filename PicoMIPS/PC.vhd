@@ -1,6 +1,6 @@
 -- PCS3412 - Organizacao e Arquitetura de Computadores I
 -- PicoMIPS
--- File: pc.vhd
+-- File: PC.vhd
 -- Author: Daniel Nery Silva de Oliveira
 --
 -- Description:

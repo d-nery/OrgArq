@@ -1,4 +1,10 @@
--- RI testbench
+-- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PicoMIPS
+-- File: RI_tb.vhd
+-- Author: Daniel Nery Silva de Oliveira
+--
+-- Description:
+--     Testbench para o Registrador de Instrucoes
 
 library IEEE;
 use IEEE.std_logic_1164.all;

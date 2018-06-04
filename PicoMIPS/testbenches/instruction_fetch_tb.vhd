@@ -1,5 +1,10 @@
--- Testbench
--- Joins PC, ICache, MP and RI to test instruction fetch
+-- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PicoMIPS
+-- File: instruction_fetch_tb.vhd
+-- Author: Daniel Nery Silva de Oliveira
+--
+-- Description:
+--     Testbench da parte completa de Instruction Fetch
 
 library IEEE;
 use IEEE.std_logic_1164.all;

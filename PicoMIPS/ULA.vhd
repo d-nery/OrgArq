@@ -4,7 +4,8 @@
 -- Author: Daniel Nery Silva de Oliveira
 --
 -- Description:
---     Unidade Logico-Aritimetica
+--     Unidade Logico-Aritimetica com 5 operações
+--     ADD, SUB, AND, OR e SLT
 
 library IEEE;
 use IEEE.std_logic_1164.all;

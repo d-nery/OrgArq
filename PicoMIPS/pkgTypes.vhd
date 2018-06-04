@@ -1,4 +1,10 @@
--- Defines constants and types
+-- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PicoMIPS
+-- File: pkgTypes.vhd
+-- Author: Daniel Nery Silva de Oliveira
+--
+-- Description:
+--     Define tipos especificos para o projeto
 
 library IEEE;
 use IEEE.std_logic_1164.all;
