@@ -75,8 +75,8 @@ begin
         instruction      => instr
     );
 
-    opcode <= instr.opcode
-    funct  <= instr.funct
+    opcode <= instr.opcode;
+    funct  <= instr.funct;
 
     add4: entity work.add4 port map (
         in1 => pc_address,

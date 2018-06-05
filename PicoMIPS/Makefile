@@ -20,9 +20,8 @@ analyse: | $(WORKDIR)
 	$(GHDL) -i $(GHDLFLAGS) $(PACKAGES) $(TARGETS)
 	$(GHDL) -a $(GHDLFLAGS) $(PACKAGES)
 	$(GHDL) -a $(GHDLFLAGS) $(TARGETS)
-	@echo
 
-all_tests: mp_test pc_test
+all_tests: mp_test pc_test ri_test ula_test instructions_test
 
 mp_test:
 	$(GHDL) -r $(GHDLFLAGS) MP_tb --vcd=$(WORKDIR)/$@.vcd
@@ -38,6 +37,10 @@ ri_test:
 
 ula_test:
 	$(GHDL) -r $(GHDLFLAGS) ULA_tb --vcd=$(WORKDIR)/$@.vcd
+	gtkwave $(WORKDIR)/$@.vcd
+
+cache_test:
+	$(GHDL) -r $(GHDLFLAGS) ICache_tb --stop-time=2us --vcd=$(WORKDIR)/$@.vcd
 	gtkwave $(WORKDIR)/$@.vcd
 
 instructions_test:
