@@ -24,8 +24,10 @@ entity FD is
 
         reg_write:   in std_logic;
 
-        dmem_enable: in std_logic;
-        dmem_rw:     in std_logic;
+        icache_en: in std_logic;
+
+        dcache_en: in std_logic;
+        dcache_rw: in std_logic;
 
         mux_memtoreg: in std_logic;
         mux_regdest:  in std_logic;
@@ -38,11 +40,11 @@ entity FD is
 end entity FD;
 
 architecture FD_arch of FD is
-    signal next_instruction: word_t := (others => '0');
+    signal icache_data: word_t := (others => '0');
     signal instr: instruction_t;
 
-    signal ext_immed: word_t := (others => '0');
-    signal ext_immed_shifted: word_t := (others => '0');
+    signal ext_immed:            word_t := (others => '0');
+    signal ext_immed_shifted:    word_t := (others => '0');
     signal jump_address_shifted: word_t := (others => '0');
 
     signal pc_new_address:   word_t := (others => '0');
@@ -52,29 +54,62 @@ architecture FD_arch of FD is
     signal pc4_plus_immed:   word_t := (others => '0');
 
     signal reg_write_data: word_t := (others => '0');
-    signal reg_dest: nibble_t := (others => '0');
+    signal reg_dest:       nibble_t := (others => '0');
 
-    signal reg_data1: word_t := (others => '0');
-    signal reg_data2: word_t := (others => '0');
-    signal dmem_data: word_t := (others => '0');
+    signal reg_data1:  word_t := (others => '0');
+    signal reg_data2:  word_t := (others => '0');
+    signal dmem_data:  word_t := (others => '0');
     signal ula_result: word_t := (others => '0');
 
     signal ula_src1: word_t := (others => '0');
-begin
-    -- ICache
 
+    signal icache_mem_addr:   word_t;
+    signal icache_mem_data:   word_t;
+    signal icache_mem_enable: std_logic;
+    signal icache_mem_write:  std_logic;
+    signal icache_mem_ready:  std_logic;
+    signal PC_wr:             std_logic;
+    signal icache_done:       std_logic;
+    signal icache_enable:     std_logic;
+begin
     PC: entity work.PC port map (
         clk => clk,
         new_address => pc_new_address,
         current_address => pc_address,
 
         reset => '0',
-        wr => '1'
+        wr    => PC_wr
+    );
+
+    ICache: entity work.ICache port map (
+        clk => clk,
+        enable => icache_en,
+
+        read_addr => pc_address,
+        data_out  => icache_data,
+        uc_done   => icache_done,
+
+        mem_addr   => icache_mem_addr,
+        mem_data   => icache_mem_data,
+        mem_ready  => icache_mem_ready,
+        mem_enable => icache_mem_enable,
+        mem_write  => icache_mem_write
+    );
+
+    MP0: entity work.MP generic map (
+        filen => "mp_teste.txt"
+    ) port map (
+        address => icache_mem_addr,
+        data_o => icache_mem_data,
+        data_i => (others => '0'),
+        mem_ready => icache_mem_ready,
+        enable => icache_mem_enable,
+        mem_write => '0'
     );
 
     RI: entity work.RI port map (
         clk              => clk,
-        new_instruction  => next_instruction,
+        new_instruction  => icache_data,
         instruction      => instr
     );
 
