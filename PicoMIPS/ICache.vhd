@@ -5,20 +5,25 @@
 --
 -- Description:
 --     Cache para Memoria de instrucoes
--- Nao testado ainda
 
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
+
 use work.constants.all;
 use work.types.all;
 
 entity ICache is
+    generic (
+        Taccess: in time := 5 ns
+    );
     port (
         clk:    in std_logic;
         enable: in std_logic;
+
+        state_s: out std_logic_vector(2 downto 0);
 
         -- From UC/FD
         read_addr: in  word_t;
@@ -26,8 +31,10 @@ entity ICache is
         uc_done:   out std_logic;
 
         -- From MP
-        mem_addr: out word_t    := (others => '0');
-        mem_data: in  word_t
+        mem_addr:  out word_t := (others => '0');
+        mem_data:  in  word_t;
+        mem_ready: in  std_logic;
+        mem_read:  out std_logic
     );
 end entity ICache;
 
@@ -66,13 +73,15 @@ begin
         if rising_edge(clk) then
             case state is
                 when INIT =>
+                    state_s <= "000";
                     for i in 0 to nb_blocks - 1 loop
                         cache(i).valid <= false;
                     end loop;
                     state <= SLEEP;
 
                 when SLEEP =>
-                    uc_done     <= '0';
+                    state_s <= "001";
+                    uc_done  <= '0';
                     s_hit    <= '0';
                     hit      := false;
                     word_offset := 0;
@@ -81,6 +90,7 @@ begin
                     end if;
 
                 when GET_DATA =>
+                    state_s <= "010";
                     cpu_addr := to_integer(unsigned(read_addr));
 
                     offset := (cpu_addr mod block_size) / 4;
@@ -94,31 +104,40 @@ begin
                     end if;
 
                     if hit then
-                        data_out <= cache(index).data(offset);
-                        uc_done <= '1';
+                        data_out <= cache(index).data(offset) after Taccess;
+                        uc_done <= '1' after Taccess;
                         state <= DONE;
                     else -- MISS
                         mem_addr_tmp := std_logic_vector(to_unsigned((to_integer(unsigned(read_addr)) / block_size) * block_size, mem_addr_tmp'length));
                         state         <= read_miss;
                         mem_addr      <= mem_addr_tmp;
+                        mem_read      <= '1';
                     end if;
 
                 when READ_MISS =>
-                    cache(index).data(word_offset) <= mem_data;
-                    if (word_offset = words_per_block - 1) then
-                        cache(index).valid <= true;
-                        cache(index).tag   <= tag;
-                        data_out           <= cache(index).data(offset);
-                        uc_done            <= '1';
-                        state <= DONE;
-                    else
-                        word_offset := word_offset + 1;
-                        mem_addr_tmp := std_logic_vector(to_unsigned(to_integer(unsigned(mem_addr_tmp)) + 4, mem_addr_tmp'length));
-                        mem_addr     <= mem_addr_tmp;
+                    state_s <= "011";
+
+                    if mem_ready = '1' then
+                        cache(index).data(word_offset) <= mem_data;
+                        -- Se preecnheu linha, termina
+                        if (word_offset = words_per_block - 1) then
+                            cache(index).valid <= true;
+                            cache(index).tag   <= tag;
+                            data_out           <= cache(index).data(offset) after Taccess;
+                            uc_done            <= '1' after Taccess;
+                            state <= DONE;
+                        else
+                            word_offset := word_offset + 1;
+                            mem_addr_tmp := std_logic_vector(to_unsigned(to_integer(unsigned(mem_addr_tmp)) + 4, mem_addr_tmp'length));
+                            mem_addr     <= mem_addr_tmp;
+                            mem_read     <= '0', '1' after 1 ns;
+                        end if;
                     end if;
 
                 when DONE =>
+                    state_s <= "100";
                     uc_done <= '0';
+                    mem_read <= '0';
                     if enable = '0' then
                         state <= SLEEP;
                     end if;

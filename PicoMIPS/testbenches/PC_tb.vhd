@@ -25,7 +25,10 @@ begin
     PC0: entity work.PC port map (
         clk => clk,
         new_address => new_address,
-        current_address => current_address
+        current_address => current_address,
+
+        reset => '0',
+        wr => '1'
     );
 
     process

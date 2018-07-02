@@ -19,16 +19,37 @@ end entity instruction_fetch_tb;
 
 architecture instruction_arch of instruction_fetch_tb is
     signal clk:     std_logic := '0';
+    signal pc_wr:   std_logic;
     signal address: word_t;
     signal instr:   word_t;
     signal newPC:   word_t;
 
     signal decoded_instr: instruction_t;
+
+    signal mem_ready: std_logic;
+    signal mem_read:  std_logic;
+
+    signal cache_en: std_logic := '0';
+    signal cache_done: std_logic;
+
+    signal s_addr, s_data: word_t;
+
+    signal d_opcode: std_logic_vector(05 downto 00);
+    signal d_Rs:     std_logic_vector(04 downto 00);
+    signal d_Rt:     std_logic_vector(04 downto 00);
+    signal d_Rd:     std_logic_vector(04 downto 00);
+    signal d_ShAmt:  std_logic_vector(04 downto 00);
+    signal d_funct:  std_logic_vector(05 downto 00);
+    signal d_immed:  std_logic_vector(15 downto 00);
+    signal d_jumpa:  std_logic_vector(25 downto 00);
 begin
     PC0: entity work.PC port map (
         clk => clk,
         new_address => newPC,
-        current_address => address
+        current_address => address,
+
+        reset => '0',
+        wr => pc_wr
     );
 
     U1: entity work.add4 port map(
@@ -37,17 +58,34 @@ begin
     );
 
     MP0: entity work.MP generic map (
-        filen => "mp_teste_fetch.txt",
-        Tread => 5 ns
+        filen => "mp_teste_fetch.txt"
     ) port map (
-        address => address,
-        data => instr
+        address => s_addr,
+        data => s_data,
+        mem_read => mem_read,
+        mem_ready => mem_ready
     );
 
     RI0: entity work.RI port map (
         clk => clk,
         new_instruction => instr,
         instruction => decoded_instr
+    );
+
+    ICache0: entity work.ICache port map (
+        clk => clk,
+        enable => cache_en,
+
+        -- From UC/FD
+        read_addr => address,
+        data_out  => instr,
+        uc_done   => cache_done,
+
+        -- From MP
+        mem_addr => s_addr,
+        mem_data => s_data,
+        mem_ready => mem_ready,
+        mem_read  => mem_read
     );
 
     test: process
@@ -73,14 +111,24 @@ begin
         );
 
     begin
+        -- wait for 50 ns;
+
         for i in instructions'range loop
-            wait for 10 ns; -- MP delay
+            pc_wr <= '0';
+            cache_en <= '1';
+            wait until cache_done = '1';
+            pc_wr <= '1';
+            cache_en <= '0';
+
+            wait for 5 ns;
 
             assert instr = instructions(i)
                 report "instruction error"
-                severity error;
+                    severity error;
 
-            wait for 30 ns;
+            wait until cache_done = '0';
+            wait for 5 ns;
+
             assert
                 decoded_instr.opcode = decoded_instructions(i).opcode and
                 decoded_instr.Rs     = decoded_instructions(i).Rs     and
@@ -90,7 +138,7 @@ begin
                 decoded_instr.funct  = decoded_instructions(i).funct  and
                 decoded_instr.immed  = decoded_instructions(i).immed  and
                 decoded_instr.jumpa  = decoded_instructions(i).jumpa
-                    report "Decode error"
+                report "Decode error"
                     severity error;
         end loop;
         report "End of Instruction fetch testbench";
@@ -99,10 +147,17 @@ begin
 
     clock_gen: process
     begin
-        for i in 1 to 10 loop
-            clk <= '0', '1' after 20 ns;
-            wait for 40 ns;
-        end loop;
-        wait;
+        clk <= '0', '1' after 20 ns;
+        wait for 40 ns;
     end process clock_gen;
+
+    d_opcode <= decoded_instr.opcode;
+    d_Rs <= decoded_instr.Rs;
+    d_Rt <= decoded_instr.Rt;
+    d_Rd <= decoded_instr.Rd;
+    d_ShAmt <= decoded_instr.ShAmt;
+    d_funct <= decoded_instr.funct;
+    d_immed <= decoded_instr.immed;
+    d_jumpa <= decoded_instr.jumpa;
+
 end architecture instruction_arch;

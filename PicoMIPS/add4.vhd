@@ -23,5 +23,5 @@ end entity add4;
 
 architecture add4_arch of add4 is
 begin
-    out1 <= std_logic_vector(unsigned(in1) + 1);
+    out1 <= std_logic_vector(unsigned(in1) + 4);
 end architecture add4_arch;

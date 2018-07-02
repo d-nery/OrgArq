@@ -20,6 +20,8 @@ end entity ICache_tb;
 architecture ICache_tb_arch of ICache_tb is
     signal address: word_t := (others => '0');
     signal data: word_t;
+    signal mem_ready: std_logic;
+    signal mem_read:  std_logic;
 
     signal clk: std_logic := '0';
     signal cache_en: std_logic := '0';
@@ -38,21 +40,25 @@ begin
 
         -- From MP
         mem_addr => s_addr,
-        mem_data => s_data
+        mem_data => s_data,
+        mem_ready => mem_ready,
+        mem_read  => mem_read
     );
 
     MP0: entity work.MP generic map (
         filen => "mp_teste.txt"
     ) port map (
+        mem_read => mem_read,
         address => s_addr,
-        data => s_data
+        data => s_data,
+        mem_ready => mem_ready
     );
 
     process
         type address_range is array (natural range <>) of word_t;
         constant addresses: address_range := (
-            x"00000000", x"00000001", x"00000002", x"00000003", x"00000004", x"00000005",
-            x"00000010", x"00000011", x"00000012", x"00000013", x"00000014", x"00000015"
+            x"00000000", x"00000004", x"00000008", x"0000000C", x"00000010", x"00000014",
+            x"00000040", x"00000044", x"00000048", x"0000004C", x"00000050", x"00000054"
         );
 
         constant memories: address_range := (
@@ -69,17 +75,17 @@ begin
             cache_en <= '0';
 
             assert data = memories(i)
-                report "Error on MP assertion"
+                report "Error on Cache assertion"
                 severity error;
-            wait for 100 ns;
+            wait on cache_done until cache_done = '0';
         end loop;
-        report "End of MP testbench";
+        report "End of ICache testbench";
         wait;
     end process;
 
     clock_gen: process
     begin
-        clk <= '0', '1' after 60 ns;
-        wait for 60 ns;
+        clk <= '0', '1' after 10 ns;
+        wait for 20 ns;
     end process clock_gen;
 end architecture ICache_tb_arch;

@@ -66,7 +66,10 @@ begin
     PC: entity work.PC port map (
         clk => clk,
         new_address => pc_new_address,
-        current_address => pc_address
+        current_address => pc_address,
+
+        reset => '0',
+        wr => '1'
     );
 
     RI: entity work.RI port map (

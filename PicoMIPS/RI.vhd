@@ -6,7 +6,7 @@
 -- Description:
 --     Contem o registrador de instrucoes (RI), que e composto
 --     pelos 32 bits da instrucao que deve ser executada
---     RI = Mem(CI)
+--     RI = Mem(PC)
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -16,6 +16,9 @@ use work.constants.all;
 use work.types.all;
 
 entity RI is
+    generic (
+        Tprop: in time := 2 ns
+    );
     port (
         clk:             in  std_logic;
         new_instruction: in  word_t;
@@ -33,12 +36,12 @@ begin
         end if;
     end process load_instruction;
 
-    instruction.opcode <= instr(31 downto 26);
-    instruction.Rs     <= instr(25 downto 21);
-    instruction.Rt     <= instr(20 downto 16);
-    instruction.Rd     <= instr(15 downto 11);
-    instruction.ShAmt  <= instr(10 downto 06);
-    instruction.funct  <= instr(05 downto 00);
-    instruction.immed  <= instr(15 downto 00);
-    instruction.jumpa  <= instr(25 downto 00);
+    instruction.opcode <= instr(31 downto 26) after Tprop;
+    instruction.Rs     <= instr(25 downto 21) after Tprop;
+    instruction.Rt     <= instr(20 downto 16) after Tprop;
+    instruction.Rd     <= instr(15 downto 11) after Tprop;
+    instruction.ShAmt  <= instr(10 downto 06) after Tprop;
+    instruction.funct  <= instr(05 downto 00) after Tprop;
+    instruction.immed  <= instr(15 downto 00) after Tprop;
+    instruction.jumpa  <= instr(25 downto 00) after Tprop;
 end architecture RI_arch;

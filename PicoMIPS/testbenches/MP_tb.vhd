@@ -20,19 +20,23 @@ end entity MP_tb;
 architecture MP_tb_arch of MP_tb is
     signal address: word_t;
     signal data: word_t;
+    signal mem_ready: std_logic;
+    signal mem_read:  std_logic;
 begin
     MP0: entity work.MP generic map (
         filen => "mp_teste.txt"
     ) port map (
+        mem_read => mem_read,
         address => address,
-        data => data
+        data => data,
+        mem_ready => mem_ready
     );
 
     process
         type address_range is array (natural range <>) of word_t;
         constant addresses: address_range := (
-            x"00000000", x"00000001", x"00000002", x"00000003", x"00000004", x"00000005",
-            x"00000010", x"00000011", x"00000012", x"00000013", x"00000014", x"00000015"
+            x"00000000", x"00000004", x"00000008", x"0000000C", x"00000010", x"00000014",
+            x"00000040", x"00000044", x"00000048", x"0000004C", x"00000050", x"00000054"
         );
 
         constant memories: address_range := (
@@ -42,7 +46,10 @@ begin
     begin
         for i in addresses'range loop
             address <= addresses(i);
-            wait for 60 ns;
+            mem_read <= '1';
+            wait on mem_ready until mem_ready = '1';
+            mem_read <= '0';
+            wait for 10 ns;
 
             assert data = memories(i)
                 report "Error on MP assertion"

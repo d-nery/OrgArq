@@ -24,8 +24,10 @@ entity MP is
         Tread: in time := 50 ns
     );
     port (
-        address: in  word_t;
-        data:    out word_t
+        mem_read:  in  std_logic := '0';
+        address:   in  word_t;
+        data:      out word_t;
+        mem_ready: out std_logic
     );
 end entity MP;
 
@@ -66,5 +68,11 @@ architecture MP_arch of MP is
     constant main_memory: memory_t := parse_mp(filename => filen);
 
 begin
-    data <= main_memory(to_integer(unsigned(address))) after Tread;
+    -- byte index -> word index
+    process (mem_read) begin
+        if mem_read = '1' then
+            mem_ready <= '0', '1' after Tread;
+            data <= main_memory(to_integer(unsigned(address(31 downto 2)))) after Tread;
+        end if;
+    end process;
 end architecture MP_arch;
