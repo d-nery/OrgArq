@@ -31,10 +31,11 @@ entity ICache is
         uc_done:   out std_logic;
 
         -- From MP
-        mem_addr:  out word_t := (others => '0');
-        mem_data:  in  word_t;
-        mem_ready: in  std_logic;
-        mem_read:  out std_logic
+        mem_addr:   out word_t := (others => '0');
+        mem_data:   in  word_t;
+        mem_ready:  in  std_logic;
+        mem_enable: out std_logic;
+        mem_write:  out std_logic
     );
 end entity ICache;
 
@@ -74,6 +75,7 @@ begin
             case state is
                 when INIT =>
                     state_s <= "000";
+                    mem_write <= '0'; -- Always read
                     for i in 0 to nb_blocks - 1 loop
                         cache(i).valid <= false;
                     end loop;
@@ -85,6 +87,7 @@ begin
                     s_hit    <= '0';
                     hit      := false;
                     word_offset := 0;
+                    mem_enable <= '0';
                     if enable = '1' then
                         state <= GET_DATA;
                     end if;
@@ -109,9 +112,9 @@ begin
                         state <= DONE;
                     else -- MISS
                         mem_addr_tmp := std_logic_vector(to_unsigned((to_integer(unsigned(read_addr)) / block_size) * block_size, mem_addr_tmp'length));
-                        state         <= read_miss;
-                        mem_addr      <= mem_addr_tmp;
-                        mem_read      <= '1';
+                        state        <= read_miss;
+                        mem_addr     <= mem_addr_tmp;
+                        mem_enable   <= '1';
                     end if;
 
                 when READ_MISS =>
@@ -130,14 +133,14 @@ begin
                             word_offset := word_offset + 1;
                             mem_addr_tmp := std_logic_vector(to_unsigned(to_integer(unsigned(mem_addr_tmp)) + 4, mem_addr_tmp'length));
                             mem_addr     <= mem_addr_tmp;
-                            mem_read     <= '0', '1' after 1 ns;
+                            mem_enable   <= '0', '1' after 1 ns;
                         end if;
                     end if;
 
                 when DONE =>
                     state_s <= "100";
                     uc_done <= '0';
-                    mem_read <= '0';
+                    mem_enable <= '0';
                     if enable = '0' then
                         state <= SLEEP;
                     end if;

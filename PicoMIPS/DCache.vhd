@@ -23,128 +23,211 @@ entity DCache is
     port (
         clk:    in std_logic;
 
-        enable: in std_logic;
+        -- From/To UC/FD
+        uc_enable: in  std_logic;
+        uc_write:  in  std_logic;
+        uc_addr:   in  word_t;
+        uc_ready:  out std_logic;
+        uc_data_o: out word_t;
+        uc_data_i: in  word_t;
 
-        state_s: out std_logic_vector(2 downto 0);
-
-        -- From UC/FD
-        read_addr: in  word_t;
-        data_out:  out word_t := (others => '0');
-        uc_done:   out std_logic;
-
-        -- From MP
-        mem_addr:  out word_t := (others => '0');
-        mem_data:  in  word_t;
-        mem_ready: in  std_logic;
-        mem_read:  out std_logic
+        -- From/To Memory
+        mem_enable: out std_logic;
+        mem_write:  out std_logic;
+        mem_ready:  in  std_logic;
+        mem_addr:   out word_t;
+        mem_data_o: out word_t;
+        mem_data_i: in  word_t
     );
 end entity DCache;
 
 architecture DCache_arch of DCache is
     constant cache_size: positive := 2**14; -- 4096*4 bytes
     constant block_size: positive := 2**8;  -- 64 bytes/bloco
+    constant associativity: positive := 2;
 
     constant words_per_block: positive := block_size / 4;
-    constant nb_blocks: positive := cache_size / block_size; -- 256 blocos
+    constant nb_blocks: positive := cache_size / block_size / associativity; -- 128 blocos
 
     type set_t is array(0 to words_per_block - 1) of word_t; -- Palavras do bloco
     type entry_t is record -- Cache entries
         valid: boolean;
+        dirty: boolean;
         tag:   natural;
         data:  set_t;
     end record entry_t;
 
-    type cache_t is array (0 to nb_blocks - 1) of entry_t;
+    type cache_t is array (0 to nb_blocks - 1, 0 to associativity - 1) of entry_t;
 
-    -- Apenas leitura da memória
-    type state_t is (INIT, SLEEP, GET_DATA, READ_MISS, DONE);
-
-    signal cache: cache_t; -- actual cache
-    signal state: state_t := INIT;
-    signal s_hit: std_logic;
 begin
-    cache_loop: process (clk)
-        variable tag:          natural;
-        variable index:        natural range 0 to nb_blocks - 1;
-        variable offset:       natural range 0 to words_per_block - 1;
-        variable word_offset:  natural range 0 to words_per_block - 1;
-        variable cpu_addr:     integer;
-        variable hit:          boolean;
-        variable mem_addr_tmp: word_t := (others => '0');
+    cache_loop: process
+        variable cache:       cache_t;
+        variable uc_address:  natural;
+        variable word_offset: natural range 0 to words_per_block - 1;
+        variable block_index: natural range 0 to nb_blocks - 1;
+        variable uc_tag:      natural;
+        variable entry_index: natural range 0 to associativity - 1;
+        variable hit:         boolean;
+        variable next_entry:  natural range 0 to associativity - 1 := 0;
+
+    -- procedures
+    procedure read_hit is
     begin
-        if rising_edge(clk) then
-            case state is
-                when INIT =>
-                    state_s <= "000";
-                    for i in 0 to nb_blocks - 1 loop
-                        cache(i).valid <= false;
-                    end loop;
-                    state <= SLEEP;
+        uc_data_o <= cache(block_index, entry_index).data(word_offset);
+        uc_ready  <= '1' after Taccess;
+        wait until clk = '0';
+        uc_ready  <= '0' after Taccess;
+    end procedure read_hit;
 
-                when SLEEP =>
-                    state_s <= "001";
-                    uc_done  <= '0';
-                    s_hit    <= '0';
-                    hit      := false;
-                    word_offset := 0;
-                    if enable = '1' then
-                        state <= GET_DATA;
-                    end if;
+    procedure write_hit is
+    begin
+        cache(block_index, entry_index).data(word_offset) := uc_data_i;
+        cache(block_index, entry_index).dirty := true;
+        uc_ready  <= '1' after Taccess;
+        wait until clk = '0';
+        uc_ready  <= '0' after Taccess;
+    end procedure write_hit;
 
-                when GET_DATA =>
-                    state_s <= "010";
-                    cpu_addr := to_integer(unsigned(read_addr));
+    procedure write_back is
+        variable next_addr:   natural;
+        variable old_woffset: natural;
+    begin
+        next_addr := (cache(block_index, entry_index).tag * nb_blocks + block_index) * block_size;
+        wait until clk = '1';
+        mem_write  <= '1';
+        old_woffset := 0;
 
-                    offset := (cpu_addr mod block_size) / 4;
-                    index  := (cpu_addr / block_size) mod nb_blocks;
-                    tag    := cpu_addr / block_size / nb_blocks;
+        write_l: loop
+            mem_enable <= '1';
+            mem_addr   <= std_logic_vector(to_unsigned(next_addr, mem_addr'length));
+            mem_data_o <= cache(block_index, entry_index).data(old_woffset);
 
-                    -- Check hit
-                    if (cache(index).valid = true and cache(index).tag = tag) then
-                        hit   := true;
-                        s_hit <= '1';
-                    end if;
+            wait_l: loop
+                exit write_l when (mem_ready = '1' and old_woffset = words_per_block - 1);
+                exit wait_l  when mem_ready = '1';
+            end loop wait_l;
 
-                    if hit then
-                        data_out <= cache(index).data(offset) after Taccess;
-                        uc_done <= '1' after Taccess;
-                        state <= DONE;
-                    else -- MISS
-                        mem_addr_tmp := std_logic_vector(to_unsigned((to_integer(unsigned(read_addr)) / block_size) * block_size, mem_addr_tmp'length));
-                        state         <= read_miss;
-                        mem_addr      <= mem_addr_tmp;
-                        mem_read      <= '1';
-                    end if;
+            old_woffset  := old_woffset + 1;
+            next_addr := next_addr + 4;
+            mem_enable <= '0';
+            wait for 2 ns;
+        end loop write_l;
 
-                when READ_MISS =>
-                    state_s <= "011";
+        cache(block_index, entry_index).dirty := false;
+        mem_write <= '0';
+        mem_enable <= '0';
+    end procedure write_back;
 
-                    if mem_ready = '1' then
-                        cache(index).data(word_offset) <= mem_data;
-                        -- Se preecnheu linha, termina
-                        if (word_offset = words_per_block - 1) then
-                            cache(index).valid <= true;
-                            cache(index).tag   <= tag;
-                            data_out           <= cache(index).data(offset) after Taccess;
-                            uc_done            <= '1' after Taccess;
-                            state <= DONE;
-                        else
-                            word_offset := word_offset + 1;
-                            mem_addr_tmp := std_logic_vector(to_unsigned(to_integer(unsigned(mem_addr_tmp)) + 4, mem_addr_tmp'length));
-                            mem_addr     <= mem_addr_tmp;
-                            mem_read     <= '0', '1' after 1 ns;
-                        end if;
-                    end if;
+    procedure read_block is
+        variable next_addr: natural;
+        variable new_woffset: natural;
+    begin
+        next_addr := uc_address;
+        wait until clk = '1';
+        mem_write   <= '0';
+        new_woffset := 0;
 
-                when DONE =>
-                    state_s <= "100";
-                    uc_done <= '0';
-                    mem_read <= '0';
-                    if enable = '0' then
-                        state <= SLEEP;
-                    end if;
-            end case;
+        read_l: loop
+            mem_enable  <= '1';
+            mem_addr <= std_logic_vector(to_unsigned(next_addr, mem_addr'length));
+
+            wait until mem_ready = '1';
+
+            cache(block_index, entry_index).data(new_woffset) := mem_data_i;
+
+            if new_woffset = words_per_block - 1 then
+                exit read_l;
+                end if;
+
+                new_woffset  := new_woffset + 1;
+                next_addr := next_addr + 4;
+            mem_enable <= '0';
+            wait for 2 ns;
+
+        end loop read_l;
+
+        cache(block_index, entry_index).valid := true;
+        cache(block_index, entry_index).tag   := uc_tag;
+        cache(block_index, entry_index).dirty := false;
+        mem_enable <= '0';
+    end procedure read_block;
+
+    procedure replace_block is
+    begin
+        entry_index := next_entry;
+        next_entry := (next_entry + 1) mod associativity;
+
+        if cache(block_index, entry_index).dirty then
+            write_back;
         end if;
+        read_block;
+    end procedure replace_block;
+
+    procedure read_miss is
+    begin
+        replace_block;
+        read_hit;
+    end procedure read_miss;
+
+    procedure write_miss is
+    begin
+        replace_block;
+        write_hit;
+    end procedure write_miss;
+
+    begin
+        -- Initialize cache signals
+        uc_ready   <= '0';
+        uc_data_o  <= (others => '0');
+        mem_enable <= '0';
+        mem_write  <= '0';
+        mem_addr   <= (others => '0');
+        mem_data_o <= (others => '0');
+
+        -- Initialize cache entries
+        for i in natural range 0 to nb_blocks - 1 loop
+            for j in natural range 0 to associativity - 1 loop
+                cache(i, j).dirty := false;
+                cache(i, j).valid := false;
+            end loop;
+        end loop;
+
+        -- Begin
+        main_loop: loop
+            -- Wait for UC
+            wait until clk = '1' and uc_enable = '1';
+
+            -- Decode address
+            uc_address  := to_integer(unsigned(uc_addr));
+            word_offset := (uc_address mod block_size) / 4;
+            block_index := (uc_address / block_size) mod nb_blocks;
+            uc_tag      := uc_address / block_size / nb_blocks;
+
+            -- Check hit
+            hit         := false;
+            for i in natural range 0 to associativity - 1 loop
+                if cache(block_index, i).valid and cache(block_index, i).tag = uc_tag then
+                    hit := true;
+                    entry_index := i;
+                    exit;
+                end if;
+            end loop;
+
+            if hit then
+                if uc_write = '1' then
+                    write_hit;
+                else
+                    read_hit;
+                end if;
+            else
+                if uc_write = '1' then
+                    write_miss;
+                else
+                    read_miss;
+                end if;
+            end if;
+        end loop main_loop;
+
     end process cache_loop;
 
 end architecture DCache_arch;

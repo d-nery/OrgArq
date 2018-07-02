@@ -26,8 +26,9 @@ architecture instruction_arch of instruction_fetch_tb is
 
     signal decoded_instr: instruction_t;
 
-    signal mem_ready: std_logic;
-    signal mem_read:  std_logic;
+    signal mem_ready:  std_logic;
+    signal mem_write:  std_logic;
+    signal mem_enable: std_logic;
 
     signal cache_en: std_logic := '0';
     signal cache_done: std_logic;
@@ -61,9 +62,11 @@ begin
         filen => "mp_teste_fetch.txt"
     ) port map (
         address => s_addr,
-        data => s_data,
-        mem_read => mem_read,
-        mem_ready => mem_ready
+        data_o => s_data,
+        data_i => (others => '0'),
+        mem_ready => mem_ready,
+        enable => mem_enable,
+        mem_write => mem_write
     );
 
     RI0: entity work.RI port map (
@@ -82,10 +85,11 @@ begin
         uc_done   => cache_done,
 
         -- From MP
-        mem_addr => s_addr,
-        mem_data => s_data,
-        mem_ready => mem_ready,
-        mem_read  => mem_read
+        mem_addr   => s_addr,
+        mem_data   => s_data,
+        mem_ready  => mem_ready,
+        mem_enable => mem_enable,
+        mem_write  => mem_write
     );
 
     test: process

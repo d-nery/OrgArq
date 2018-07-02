@@ -20,14 +20,17 @@ use work.types.all;
 
 entity MP is
     generic (
-        filen: in string;
-        Tread: in time := 50 ns
+        filen:  in string;
+        Tread:  in time := 50 ns;
+        Twrite: in time := 50 ns
     );
     port (
-        mem_read:  in  std_logic := '0';
         address:   in  word_t;
-        data:      out word_t;
-        mem_ready: out std_logic
+        data_i:    in  word_t;
+        data_o:    out word_t;
+        mem_ready: out std_logic := '0';
+        enable:    in  std_logic;
+        mem_write: in  std_logic
     );
 end entity MP;
 
@@ -65,14 +68,23 @@ architecture MP_arch of MP is
         return temp_memory;
     end function;
 
-    constant main_memory: memory_t := parse_mp(filename => filen);
+    signal main_memory: memory_t := parse_mp(filename => filen);
 
 begin
     -- byte index -> word index
-    process (mem_read) begin
-        if mem_read = '1' then
-            mem_ready <= '0', '1' after Tread;
-            data <= main_memory(to_integer(unsigned(address(31 downto 2)))) after Tread;
+    process (enable) begin
+        if rising_edge(enable) then
+            if mem_write = '0' then
+                data_o <= main_memory(to_integer(unsigned(address(31 downto 2)))) after Tread;
+                mem_ready <= '1' after Tread;
+            elsif mem_write = '1' then
+                main_memory(to_integer(unsigned(address(31 downto 2)))) <= data_i after Twrite;
+                mem_ready <= '1' after Twrite;
+            end if;
+        end if;
+
+        if falling_edge(enable) then
+            mem_ready <= '0';
         end if;
     end process;
 end architecture MP_arch;

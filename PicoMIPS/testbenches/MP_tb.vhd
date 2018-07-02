@@ -20,16 +20,18 @@ end entity MP_tb;
 architecture MP_tb_arch of MP_tb is
     signal address: word_t;
     signal data: word_t;
-    signal mem_ready: std_logic;
-    signal mem_read:  std_logic;
+    signal mem_ready:  std_logic;
+    signal mem_enable: std_logic;
 begin
     MP0: entity work.MP generic map (
         filen => "mp_teste.txt"
     ) port map (
-        mem_read => mem_read,
         address => address,
-        data => data,
-        mem_ready => mem_ready
+        data_o => data,
+        data_i => (others => '0'),
+        mem_ready => mem_ready,
+        enable => mem_enable,
+        mem_write => '0'
     );
 
     process
@@ -46,9 +48,9 @@ begin
     begin
         for i in addresses'range loop
             address <= addresses(i);
-            mem_read <= '1';
-            wait on mem_ready until mem_ready = '1';
-            mem_read <= '0';
+            mem_enable <= '1';
+            wait until mem_ready = '1';
+            mem_enable <= '0';
             wait for 10 ns;
 
             assert data = memories(i)
