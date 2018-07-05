@@ -67,7 +67,7 @@ begin
             when OP_SW   => prox_estado <= SW;
             when others  => prox_estado <= INICIO;
         end case;
-    end process state;
+    end process state; 
 
     with estado_atual select
         mux_regdest <= '1' when R,

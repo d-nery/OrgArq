@@ -15,6 +15,9 @@ use work.constants.all;
 use work.types.all;
 
 entity add4 is
+    generic (
+        Tsoma: in time := 2 ns
+    );
     port (
         in1:  in  word_t;
         out1: out word_t
@@ -23,5 +26,5 @@ end entity add4;
 
 architecture add4_arch of add4 is
 begin
-    out1 <= std_logic_vector(unsigned(in1) + 4);
+    out1 <= std_logic_vector(unsigned(in1) + 4) after Tsoma;
 end architecture add4_arch;

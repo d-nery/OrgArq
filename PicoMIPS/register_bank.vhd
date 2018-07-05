@@ -21,9 +21,13 @@ use work.constants.all;
 use work.types.all;
 
 entity register_bank is
+    generic (
+        Tread:  in time := 5 ns;
+        Twrite: in time := 5 ns
+    );
     port (
         clk:         in  std_logic;
-        is_write:    in  std_logic;
+        reg_write:   in  std_logic;
 
         write_index: in  nibble_t;
 
@@ -39,15 +43,31 @@ end entity register_bank;
 
 architecture register_bank_arch of register_bank is
     type reg_array is array(0 to 7) of word_t;
-    signal registers: reg_array := (others => (others => '0'));
+    signal registers: reg_array := (
+        x"00000000", -- Geral 0
+        x"00000000", -- Geral 1
+        x"00000000", -- Geral 2
+        x"00000000", -- Geral 3
+        x"00000200", -- $gp
+        x"FFFFFFFF", -- $sp
+        x"FFFFFFFF", -- $fp
+        x"00000000"  -- $ra
+    );
+
+    signal r1: nibble_t;
+    signal r2: nibble_t;
 begin
     sync_write: process (clk)
     begin
-        if (rising_edge(clk) and is_write = '1') then
-            registers(to_integer(unsigned(write_index))) <= write_data;
+        if (rising_edge(clk)) then
+            if (reg_write = '1') then
+                registers(to_integer(unsigned(write_index))) <= write_data after Twrite;
+            end if;
+            r1 <= read_index1;
+            r2 <= read_index2;
         end if;
     end process sync_write;
 
-    read_data1 <= registers(to_integer(unsigned(read_index1)));
-    read_data2 <= registers(to_integer(unsigned(read_index2)));
+    read_data1 <= registers(to_integer(unsigned(r1))) after Tread;
+    read_data2 <= registers(to_integer(unsigned(r2))) after Tread;
 end architecture register_bank_arch;

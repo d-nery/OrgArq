@@ -16,167 +16,226 @@ use work.types.all;
 
 entity FD is
     port (
-        clk: in std_logic;
-        rst: in std_logic;
+        clk:   in std_logic;
+        rst:   in std_logic;
+        pc_wr: in std_logic;
+
+        icache_en:   in  std_logic;
+        icache_done: out std_logic;
 
         opcode: out std_logic_vector(5 downto 0);
         funct:  out std_logic_vector(5 downto 0);
 
         reg_write:   in std_logic;
 
-        icache_en: in std_logic;
+        mux_rbwr:    in std_logic;
+        mux_alusrc:  in std_logic;
+        mux_wb:      in std_logic;
+        mux_mem_src: in std_logic;
+        mux_pcsrc1:  in std_logic;
+        mux_pcsrc2:  in std_logic;
 
-        dcache_en: in std_logic;
-        dcache_rw: in std_logic;
+        ula_zero:    out std_logic;
+        ula_control: in  nibble_t;
 
-        mux_memtoreg: in std_logic;
-        mux_regdest:  in std_logic;
-        mux_ulasrc:   in std_logic;
-        mux_newPC:    in std_logic_vector(1 downto 0);
-
-        ula_zero: out std_logic;
-        ula_op:   in  nibble_t
+        dcache_ready: out std_logic;
+        dcache_wr:    in  std_logic;
+        dcache_en:    in  std_logic
     );
 end entity FD;
 
 architecture FD_arch of FD is
-    signal icache_data: word_t := (others => '0');
-    signal instr: instruction_t;
+    -- PC
+    signal pc_addr:     word_t;
+    signal pc_addr_4:   word_t;
+    signal pc_new_addr: word_t;
 
-    signal ext_immed:            word_t := (others => '0');
-    signal ext_immed_shifted:    word_t := (others => '0');
-    signal jump_address_shifted: word_t := (others => '0');
-
-    signal pc_new_address:   word_t := (others => '0');
-    signal pc_address:       word_t := (others => '0');
-    signal pc_address_plus4: word_t := (others => '0');
-
-    signal pc4_plus_immed:   word_t := (others => '0');
-
-    signal reg_write_data: word_t := (others => '0');
-    signal reg_dest:       nibble_t := (others => '0');
-
-    signal reg_data1:  word_t := (others => '0');
-    signal reg_data2:  word_t := (others => '0');
-    signal dmem_data:  word_t := (others => '0');
-    signal ula_result: word_t := (others => '0');
-
-    signal ula_src1: word_t := (others => '0');
-
+    -- Instruction Cache
+    signal icache_data:       word_t;
     signal icache_mem_addr:   word_t;
-    signal icache_mem_data:   word_t;
     signal icache_mem_enable: std_logic;
     signal icache_mem_write:  std_logic;
-    signal icache_mem_ready:  std_logic;
-    signal PC_wr:             std_logic;
-    signal icache_done:       std_logic;
-    signal icache_enable:     std_logic;
-begin
-    PC: entity work.PC port map (
-        clk => clk,
-        new_address => pc_new_address,
-        current_address => pc_address,
 
-        reset => '0',
-        wr    => PC_wr
+    -- RI
+    signal instruction:  instruction_t;
+    signal ri_rs:        std_logic_vector(4 downto 0);
+    signal ri_rt:        std_logic_vector(4 downto 0);
+    signal ri_rd:        std_logic_vector(4 downto 0);
+    signal ri_immed:     std_logic_vector(15 downto 0);
+    signal ri_jumpa:     std_logic_vector(25 downto 0);
+    signal ri_immed_ext: word_t;
+
+    -- Register Bank
+    signal rb_read1:       word_t;
+    signal rb_read2:       word_t;
+    signal rb_write_index: word_t;
+    signal rb_write_data:  word_t;
+
+    -- ULA
+    signal ula_src2: word_t;
+    signal ula_res:  word_t;
+
+    -- Data Cache
+    signal dcache_data: word_t;
+    signal dcache_mem_addr:   word_t;
+    signal dcache_mem_data:   word_t;
+    signal dcache_mem_enable: std_logic;
+    signal dcache_mem_write:  std_logic;
+
+    -- MP
+    signal mem_ready:   std_logic;
+    signal mem_enable:  std_logic;
+    signal mem_write:   std_logic;
+    signal mem_data:    word_t;
+    signal mem_address: word_t;
+
+    -- outros
+    signal pcsrc1: word_t;
+    signal sll1:   word_t;
+    signal temp1:  word_t;
+    signal temp2:  word_t;
+
+begin
+    R1: entity work.PC port map (
+        clk         => clk,
+        new_address => pc_new_addr,
+        wr          => pc_wr,
+        reset       => rst,
+
+        current_address => pc_addr
     );
 
-    ICache: entity work.ICache port map (
-        clk => clk,
-        enable => icache_en,
+    add4: entity work.add4 port map (
+        in1  => pc_addr,
+        out1 => pc_addr_4
+    );
 
-        read_addr => pc_address,
-        data_out  => icache_data,
-        uc_done   => icache_done,
+    C1: entity work.ICache port map (
+        clk       => clk,
+        enable    => icache_en,
+        read_addr => pc_addr,
+
+        data_out => icache_data,
+        uc_done  => icache_done,
 
         mem_addr   => icache_mem_addr,
-        mem_data   => icache_mem_data,
-        mem_ready  => icache_mem_ready,
+        mem_data   => mem_data,
+        mem_ready  => mem_ready,
         mem_enable => icache_mem_enable,
         mem_write  => icache_mem_write
     );
 
-    MP0: entity work.MP generic map (
-        filen => "mp_teste.txt"
-    ) port map (
-        address => icache_mem_addr,
-        data_o => icache_mem_data,
-        data_i => (others => '0'),
-        mem_ready => icache_mem_ready,
-        enable => icache_mem_enable,
-        mem_write => '0'
+    R2: entity work.RI port map (
+        clk => clk,
+
+        new_instruction => icache_data,
+        instruction     => instruction
     );
 
-    RI: entity work.RI port map (
-        clk              => clk,
-        new_instruction  => icache_data,
-        instruction      => instr
+    opcode   <= instruction.opcode;
+    ri_rs    <= instruction.Rs;
+    ri_rt    <= instruction.Rt;
+    ri_rd    <= instruction.Rd;
+    funct    <= instruction.funct;
+    ri_immed <= instruction.immed;
+    ri_jumpa <= instruction.jumpa;
+
+    M4: entity work.mux2 port map (
+        in1    => ri_rt,
+        in2    => ri_rd,
+        out1   => rb_write_index,
+        choice => mux_rbwr
     );
-
-    opcode <= instr.opcode;
-    funct  <= instr.funct;
-
-    add4: entity work.add4 port map (
-        in1 => pc_address,
-        out1 => pc_address_plus4
-    );
-
-    SExt: entity work.sign_extend port map (
-        in1  => instr.immed,
-        out1 => ext_immed
-    );
-
-    ext_immed_shifted <= ext_immed(31 downto 2) & "00";
-    jump_address_shifted <= pc_address_plus4(31 downto 28) & instr.jumpa & "00";
-    pc4_plus_immed <= std_logic_vector(unsigned(pc_address_plus4) + unsigned(ext_immed_shifted));
-
-    mux3: entity work.mux3 generic map (n => pc4_plus_immed'length) port map (
-        in1    => pc4_plus_immed,
-        in2    => jump_address_shifted,
-        in3    => pc_address_plus4,
-        out1   => pc_new_address,
-        choice => mux_newPC
-    );
-
-    -- DMEM
 
     RB: entity work.register_bank port map (
-        clk         => clk,
-        is_write    => reg_write,
-        write_index => reg_dest,
-        read_index1 => instr.rs(3 downto 0),
-        read_index2 => instr.rt(3 downto 0),
-        write_data  => reg_write_data,
-        read_data1  => reg_data1,
-        read_data2  => reg_data2
+        clk => clk,
+        reg_write   => reg_write,
+
+        read_index1 => ri_rs(3 downto 0),
+        read_index2 => ri_rt(3 downto 0),
+        write_index => rb_write_index(3 downto 0),
+        write_data  => rb_write_data,
+
+        read_data1 => rb_read1,
+        read_data2 => rb_read2
     );
 
-    mux21: entity work.mux2 generic map (n => reg_dest'length) port map (
-        in1    => instr.rt(3 downto 0),
-        in2    => instr.rd(3 downto 0),
-        out1   => reg_dest,
-        choice => mux_regdest
+    SE: entity work.sign_extend port map (
+        in1  => ri_immed,
+        out1 => ri_immed_ext
     );
 
-    mux22: entity work.mux2 generic map (n => dmem_data'length) port map (
-        in1    => dmem_data,
-        in2    => ula_result,
-        out1   => reg_write_data,
-        choice => mux_memtoreg
+    M5: entity work.mux2 port map (
+        in1    => rb_read2,
+        in2    => ri_immed_ext,
+        out1   => ula_src2,
+        choice => mux_alusrc
     );
 
-    mux23: entity work.mux2 generic map (n => ext_immed'length) port map (
-        in1    => ext_immed,
-        in2    => reg_data1,
-        out1   => ula_src1,
-        choice => mux_ulasrc
-    );
-
-    ULA: entity work.ULA port map (
-        in1     => ula_src1,
-        in2     => reg_data2,
-        control => ula_op,
-        result  => ula_result,
+    ULA1: entity work.ULA port map (
+        in1     => rb_read1,
+        in2     => ula_src2,
+        control => ula_control,
+        result  => ula_res,
         zero    => ula_zero
+    );
+
+    C2: entity work.DCache port map (
+        clk => clk,
+
+        uc_addr   => ula_res,
+        uc_data_i => rb_read2,
+        uc_ready  => dcache_ready,
+        uc_write  => dcache_wr,
+        uc_enable => dcache_en,
+        uc_data_o => dcache_data,
+
+        mem_enable => dcache_mem_enable,
+        mem_write  => dcache_mem_write,
+        mem_ready  => mem_ready,
+        mem_addr   => dcache_mem_addr,
+        mem_data_o => dcache_mem_data,
+        mem_data_i => mem_data
+    );
+
+    M6: entity work.mux2 port map (
+        in1    => ula_res,
+        in2    => dcache_data,
+        out1   => rb_write_data,
+        choice => mux_wb
+    );
+
+    sll1  <= ri_immed_ext(29 downto 0) & "00";
+    temp1 <= std_logic_vector(unsigned(pc_addr_4) + unsigned(sll1));
+
+    M7: entity work.mux2 port map (
+        in1    => pc_addr_4,
+        in2    => temp1,
+        out1   => pcsrc1,
+        choice => mux_pcsrc1
+    );
+
+    temp2 <= pc_addr_4(31 downto 28) & ri_immed_ext(29 downto 0) & "00";
+
+    M8: entity work.mux2 port map (
+        in1    => temp2,
+        in2    => pcsrc1,
+        out1   => pc_new_addr,
+        choice => mux_pcsrc2
+    );
+
+    mem_enable  <= dcache_mem_enable when mux_mem_src = '0' else icache_mem_enable;
+    mem_address <= dcache_mem_addr   when mux_mem_src = '0' else icache_mem_addr;
+    mem_write   <= dcache_mem_write  when mux_mem_src = '0' else icache_mem_write;
+
+    MEM: entity work.MP generic map (
+        filen => "mp_teste_fetch.txt"
+    ) port map (
+        mem_ready => mem_ready,
+        data_o    => mem_data,
+        enable    => mem_enable,
+        address   => mem_address,
+        mem_write => mem_write,
+        data_i    => dcache_mem_data
     );
 end architecture FD_arch;

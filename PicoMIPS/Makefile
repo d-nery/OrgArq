@@ -4,7 +4,7 @@ WORKDIR := work
 VERSION := 08
 
 PACKAGES := pkgTypes.vhd pkgConstants.vhd # Manter essa ordem pq Constants usa types
-TARGETS  := add4.vhd MP.vhd mux2.vhd mux3.vhd register_bank.vhd PC.vhd RI.vhd sign_extend.vhd ULA.vhd ICache.vhd DCache.vhd UC.vhd FD.vhd
+TARGETS  := add4.vhd MP.vhd mux2.vhd register_bank.vhd PC.vhd RI.vhd sign_extend.vhd ULA.vhd ICache.vhd DCache.vhd UC.vhd FD.vhd
 
 TARGETS += $(wildcard */*.vhd)
 
