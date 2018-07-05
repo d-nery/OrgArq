@@ -35,6 +35,10 @@ ri_test:
 	$(GHDL) -r $(GHDLFLAGS) RI_tb --vcd=$(WORKDIR)/$@.vcd
 	gtkwave $(WORKDIR)/$@.vcd
 
+fd_test:
+	$(GHDL) -r $(GHDLFLAGS) FD_tb --stop-time=2500ns --vcd=$(WORKDIR)/$@.vcd
+	gtkwave $(WORKDIR)/$@.vcd
+
 ula_test:
 	$(GHDL) -r $(GHDLFLAGS) ULA_tb --vcd=$(WORKDIR)/$@.vcd
 	gtkwave $(WORKDIR)/$@.vcd

@@ -75,38 +75,4 @@ begin
             when others  => prox_estado <= INICIO;
         end case;
     end process state;
-
-    -- with estado_atual select
-    --     mux_regdest <= '1' when R,
-    --                     '0' when others;
-
-    -- with estado_atual select
-    --     mux_memtoreg <= '1' when LW,
-    --                     '0' when others;
-
-    -- with estado_atual select
-    --     mux_ulasrc <= '1' when ADDI | LW | SW,
-    --                   '0' when others;
-
-    -- with estado_atual select
-    --     reg_write <= '1' when R | ADDI| LW,
-    --                  '0' when others;
-
-    -- with estado_atual select
-    --     dmem_enable <= '0' when INICIO,
-    --                   '1' when others;
-
-    -- with estado_atual select
-    --     dmem_rw <= '1' when SW,
-    --                '0' when others;
-
-    -- with estado_atual select
-    --     mux_newPC <= "00" when INICIO,
-    --                  "11" when others;
-
-    -- with estado_atual select
-    --     ula_op <= "0000" when INICIO,
-    --               "0001" when others;
-
-    -- dmem_rw <= not clk and we;
 end architecture UC_arch;

@@ -66,9 +66,9 @@ architecture FD_arch of FD is
     signal ri_immed_ext: word_t;
 
     -- Register Bank
+    signal rb_write_index: std_logic_vector(4 downto 0);
     signal rb_read1:       word_t;
     signal rb_read2:       word_t;
-    signal rb_write_index: word_t;
     signal rb_write_data:  word_t;
 
     -- ULA
@@ -140,7 +140,9 @@ begin
     ri_immed <= instruction.immed;
     ri_jumpa <= instruction.jumpa;
 
-    M4: entity work.mux2 port map (
+    M4: entity work.mux2 generic map (
+        n => 5
+    ) port map (
         in1    => ri_rt,
         in2    => ri_rd,
         out1   => rb_write_index,
@@ -215,7 +217,7 @@ begin
         choice => mux_pcsrc1
     );
 
-    temp2 <= pc_addr_4(31 downto 28) & ri_immed_ext(29 downto 0) & "00";
+    temp2 <= pc_addr_4(31 downto 28) & (ri_jumpa & "00");
 
     M8: entity work.mux2 port map (
         in1    => temp2,
