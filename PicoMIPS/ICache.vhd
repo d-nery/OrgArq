@@ -41,7 +41,7 @@ end entity ICache;
 
 architecture ICache_arch of ICache is
     constant cache_size: positive := 2**14; -- 4096*4 bytes
-    constant block_size: positive := 2**8;  -- 64 bytes/bloco
+    constant block_size: positive := 2**6;  -- 64 bytes/bloco
 
     constant words_per_block: positive := block_size / 4;
     constant nb_blocks: positive := cache_size / block_size; -- 256 blocos

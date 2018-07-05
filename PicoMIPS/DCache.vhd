@@ -43,7 +43,7 @@ end entity DCache;
 
 architecture DCache_arch of DCache is
     constant cache_size: positive := 2**14; -- 4096*4 bytes
-    constant block_size: positive := 2**8;  -- 64 bytes/bloco
+    constant block_size: positive := 2**6;  -- 64 bytes/bloco
     constant associativity: positive := 2;
 
     constant words_per_block: positive := block_size / 4;
@@ -204,7 +204,7 @@ begin
             uc_tag      := uc_address / block_size / nb_blocks;
 
             -- Check hit
-            hit         := false;
+            hit := false;
             for i in natural range 0 to associativity - 1 loop
                 if cache(block_index, i).valid and cache(block_index, i).tag = uc_tag then
                     hit := true;

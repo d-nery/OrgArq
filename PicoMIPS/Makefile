@@ -40,15 +40,15 @@ ula_test:
 	gtkwave $(WORKDIR)/$@.vcd
 
 icache_test:
-	$(GHDL) -r $(GHDLFLAGS) ICache_tb --stop-time=4700ns --vcd=$(WORKDIR)/$@.vcd
+	$(GHDL) -r $(GHDLFLAGS) ICache_tb --stop-time=3us --vcd=$(WORKDIR)/$@.vcd
 	gtkwave $(WORKDIR)/$@.vcd
 
 dcache_test:
-	$(GHDL) -r $(GHDLFLAGS) DCache_tb --stop-time=8us --vcd=$(WORKDIR)/$@.vcd
+	$(GHDL) -r $(GHDLFLAGS) DCache_tb --stop-time=4500ns --vcd=$(WORKDIR)/$@.vcd
 	gtkwave $(WORKDIR)/$@.vcd
 
 instructions_test:
-	$(GHDL) -r $(GHDLFLAGS) instruction_fetch_tb --stop-time=7us --vcd=$(WORKDIR)/$@.vcd
+	$(GHDL) -r $(GHDLFLAGS) instruction_fetch_tb --stop-time=3us --vcd=$(WORKDIR)/$@.vcd
 	gtkwave $(WORKDIR)/$@.vcd
 
 check_syntax: | $(WORKDIR)

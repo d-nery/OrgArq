@@ -32,11 +32,11 @@ begin
     process
         type address_array is array (natural range <>) of word_t;
         type instruction_array is array (natural range <>) of instruction_t;
-        constant addresses: address_array := (
+        constant instructions: address_array := (
             x"A1B2C3D4", x"E5F6AA14", x"12A58EDF", x"36485121", x"ABCDEF12", x"00000000"
         );
 
-        constant instructions: instruction_array := (
+        constant dinstructions: instruction_array := (
             (opcode => "101000", Rs => "01101", Rt => "10010", Rd => "11000", ShAmt => "01111", funct => "010100", immed => x"C3D4", jumpa => "01101100101100001111010100"),
             (opcode => "111001", Rs => "01111", Rt => "10110", Rd => "10101", ShAmt => "01000", funct => "010100", immed => x"AA14", jumpa => "01111101101010101000010100"),
             (opcode => "000100", Rs => "10101", Rt => "00101", Rd => "10001", ShAmt => "11011", funct => "011111", immed => x"8EDF", jumpa => "10101001011000111011011111"),
@@ -45,11 +45,11 @@ begin
             (opcode => "000000", Rs => "00000", Rt => "00000", Rd => "00000", ShAmt => "00000", funct => "000000", immed => x"0000", jumpa => "00000000000000000000000000")
         );
     begin
-        for i in addresses'range loop
-            instruction <= addresses(i);
+        for i in instructions'range loop
+            instruction <= instructions(i);
             wait for 40 ns;
 
-            assert decoded_instruction.opcode = instructions(i).opcode
+            assert decoded_instruction.opcode = dinstructions(i).opcode
                 report "Error on RI assertion"
                 severity error;
         end loop;
