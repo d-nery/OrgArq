@@ -83,14 +83,14 @@ begin
         icache_en   <= '0';
         wait for 3 ns;
 
-        assert opcode = OP_R and funct = FUNC_ADD
+        assert opcode = OP_ADDI
             report "error on fetch" severity error;
 
-        -- ADD $1, $2, $3
+        -- ADDI $1, $1, $100
         reg_write   <= '0';
         mux_rbwr    <= '1';
         ula_control <= ULA_ADD;
-        mux_alusrc  <= '0';
+        mux_alusrc  <= '1';
         mux_mem_src <= '0';
         -- waits next clock cycle
         wait until rising_edge(clk);
@@ -112,7 +112,7 @@ begin
         icache_en   <= '0';
         wait for 3 ns;
 
-        assert opcode = OP_R and funct = "100010"
+        assert opcode = OP_ADDI
             report "error on fetch" severity error;
 
         report "Finish testbench";

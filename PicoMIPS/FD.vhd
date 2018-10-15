@@ -231,7 +231,7 @@ begin
     mem_write   <= dcache_mem_write  when mux_mem_src = '0' else icache_mem_write;
 
     MEM: entity work.MP generic map (
-        filen => "mp_teste_fetch.txt"
+        filen => "mp_teste_soma.txt"
     ) port map (
         mem_ready => mem_ready,
         data_o    => mem_data,
