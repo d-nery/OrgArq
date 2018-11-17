@@ -32,12 +32,15 @@ end entity ULA;
 
 architecture ULA_arch of ULA is
 begin
-    result <= std_logic_vector(signed(in1)  +  signed(in2)) after Tsoma when control = ULA_ADD               else
-              std_logic_vector(signed(in1)  -  signed(in2)) after Tsub  when control = ULA_SUB               else
-              in1 and in2                                   after Tgate when control = ULA_AND               else
-              in1 or  in2                                   after Tgate when control = ULA_OR                else
-              x"00000001"                                   after Tsoma when control = ULA_SLT and in1 < in2 else
-              x"00000000"                                   after Tsoma when control = ULA_SLT;
+    result <= std_logic_vector(signed(in1)   + signed(in2))   after Tsoma when control = ULA_ADD               else
+              std_logic_vector(unsigned(in1) + unsigned(in2)) after Tsub  when control = ULA_ADDU              else
+              std_logic_vector(signed(in1)   - signed(in2))   after Tsub  when control = ULA_SUB               else
+              in1 and in2                                     after Tgate when control = ULA_AND               else
+              in1 or  in2                                     after Tgate when control = ULA_OR                else
+              std_logic_vector(shift_left(
+                  signed(in2), to_integer(unsigned(in1))))    after Tgate when control = ULA_SLL               else
+              x"00000001"                                     after Tsoma when control = ULA_SLT and in1 < in2 else
+              x"00000000"                                     after Tsoma when control = ULA_SLT;
 
     zero   <= '1' after Tsoma when result = x"00000000" else '0' after Tsoma;
 end architecture ULA_arch;

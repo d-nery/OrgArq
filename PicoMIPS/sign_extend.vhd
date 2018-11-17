@@ -15,8 +15,11 @@ use work.constants.all;
 use work.types.all;
 
 entity sign_extend is
+    generic (
+        in_n: integer := 16
+    );
     port (
-        in1:  in  halfword_t;
+        in1:  in  std_logic_vector(in_n - 1 downto 0);
         out1: out word_t
     );
 end entity sign_extend;

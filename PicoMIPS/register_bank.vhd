@@ -54,8 +54,19 @@ architecture register_bank_arch of register_bank is
         x"00000000"  -- $ra
     );
 
-    signal r1: nibble_t;
-    signal r2: nibble_t;
+    signal r1: nibble_t := (others => '0');
+    signal r2: nibble_t := (others => '0');
+
+    -- Internal signals mapped to actual registers for
+    -- debugging purposes
+    signal s_r0 : word_t;
+    signal s_r1 : word_t;
+    signal s_r2 : word_t;
+    signal s_r3 : word_t;
+    signal s_gp : word_t;
+    signal s_sp : word_t;
+    signal s_fp : word_t;
+    signal s_ra : word_t;
 begin
     sync_write: process (clk)
     begin
@@ -63,6 +74,7 @@ begin
             if (reg_write = '1') then
                 registers(to_integer(unsigned(write_index))) <= write_data after Twrite;
             end if;
+
             r1 <= read_index1;
             r2 <= read_index2;
         end if;
@@ -70,4 +82,13 @@ begin
 
     read_data1 <= registers(to_integer(unsigned(r1))) after Tread;
     read_data2 <= registers(to_integer(unsigned(r2))) after Tread;
+
+    s_r0 <= registers(0);
+    s_r1 <= registers(1);
+    s_r2 <= registers(2);
+    s_r3 <= registers(3);
+    s_gp <= registers(4);
+    s_sp <= registers(5);
+    s_fp <= registers(6);
+    s_ra <= registers(7);
 end architecture register_bank_arch;

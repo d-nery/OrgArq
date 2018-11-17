@@ -1,9 +1,9 @@
 -- PCS3412 - Organizacao e Arquitetura de Computadores I
 -- PicoMIPS
--- File: FD_tb.vhd
+-- File: UC_tb.vhd
 --
 -- Description:
---     Testbench para o Fluxo de Dados
+--     Testbench para a Unidade de Controle
 
 
 library IEEE;
@@ -14,10 +14,10 @@ library work;
 use work.constants.all;
 use work.types.all;
 
-entity FD_tb is
-end entity FD_tb;
+entity UC_tb is
+end entity UC_tb;
 
-architecture FD_tb_arch of FD_tb is
+architecture UC_tb_arch of UC_tb is
     signal clk:          std_logic := '0';
     signal rst:          std_logic := '0';
     signal pc_wr:        std_logic := '0';
@@ -45,7 +45,7 @@ architecture FD_tb_arch of FD_tb is
     signal dcache_wr:     std_logic := '0';
     signal dcache_en:     std_logic := '0';
 begin
-    FD: entity work.FD port map (
+    UC: entity work.UC port map (
         clk => clk,
         rst => rst,
         pc_wr => pc_wr,
@@ -77,77 +77,90 @@ begin
     test1: process
 
     begin
-        wait for 50 ns;
+        -- reset inputs
+        rst         <= '1';
+        icache_done <= '0';
+        opcode      <= OP_R;
+        funct       <= FUNC_SLL;
+        ula_zero    <= '0';
 
-        mux_mem_src <= MUX_MEM_IC;
-        wait until clk = '1';
+        wait for 20 ns;
 
-        icache_en   <= '1';
-        wait until icache_done = '1' and rising_edge(clk); -- Espera término do cache
+        ---------------------------
+        -- IDLE
+        ---------------------------
 
-        icache_en   <= '0';
-        wait for 3 ns;
+        rst <= '0';
+        wait until rising_edge(clk);
+        wait for 1 ns;
 
-        assert opcode = OP_ADDI
-            report "error on fetch" severity error;
+        assert icache_en = '1'
+            report "Instruction Cache not enabled"
+            severity failure;
+
+        assert mux_mem_src = MUX_MEM_IC
+            report "Memory source not Instruction Cache"
+            severity error;
+
+        ---------------------------
+        -- FETCH
+        ---------------------------
+
+        wait for 100 ns; -- "Reading memory"
 
         -- ADDI $2, $2, $100
-        reg_write   <= '0';
-        mux_rbwr    <= MUX_RBWR_RT;
-        ula_control <= ULA_ADD;
-        mux_alusrc2 <= MUX_ALUSRC2_IMMED;
-
-        -- waits next clock cycle
-        wait until rising_edge(clk);
-
-        reg_write   <= '1';
-        mux_pcsrc1  <= '0';
-        mux_pcsrc2  <= '1';
-        pc_wr       <= '1';
-        mux_mem_src <= MUX_MEM_IC;
+        icache_done <= '1';
+        opcode      <= "001000";
 
         wait until rising_edge(clk);
+        wait for 1 ns;
 
-        pc_wr     <= '0';
-        reg_write <= '0';
-        icache_en <= '1';
+        assert icache_en = '0'
+            report "Instruction Cache not disabled"
+            severity failure;
 
-        wait until icache_done = '1' and rising_edge(clk); -- Espera término do cache
+        icache_done <= '0';
 
-        icache_en   <= '0';
-        wait for 3 ns;
+        ---------------------------
+        -- EXECUTE
+        ---------------------------
 
-        assert opcode = OP_ADDI
-            report "error on fetch" severity error;
+        -- Check all signals
+        assert reg_write = '0'
+            report "Error on RB write"
+            severity error;
 
-        -- ADDI $3, $2, $10
-        reg_write   <= '0';
-        mux_rbwr    <= MUX_RBWR_RT;
-        ula_control <= ULA_ADD;
-        mux_alusrc2 <= MUX_ALUSRC2_IMMED;
+        assert mux_rbwr = MUX_RBWR_RT
+            report "Error on RB write source"
+            severity error;
 
-        -- waits next clock cycle
-        wait until rising_edge(clk);
-
-        reg_write   <= '1';
-        mux_pcsrc1  <= '0';
-        mux_pcsrc2  <= '1';
-        pc_wr       <= '1';
-        mux_mem_src <= MUX_MEM_IC;
+        assert mux_alusrc2 = MUX_ALUSRC2_IMMED
+            report "Error on ULA source"
+            severity error;
 
         wait until rising_edge(clk);
+        wait for 1 ns;
 
-        pc_wr     <= '0';
-        reg_write <= '0';
-        icache_en <= '1';
+        ---------------------------
+        -- WRITE BACK
+        ---------------------------
 
-        wait until icache_done = '1' and rising_edge(clk); -- Espera término do cache
+        -- Check all signals
+        assert reg_write = '1'
+            report "Error on RB write"
+            severity error;
 
-        icache_en   <= '0';
-        wait for 3 ns;
+        assert pc_wr = '1'
+            report "Error on PC write"
+            severity error;
 
-        assert opcode = OP_R and funct = FUNC_SLT
-            report "error on fetch" severity error;
+        assert mux_pcsrc1 = '0'
+            report "Error on PCSRC1"
+            severity error;
+
+        assert mux_pcsrc2 = '1'
+            report "Error on PCSRC2"
+            severity error;
 
         report "Finish testbench";
 
@@ -160,4 +173,4 @@ begin
         wait for 30 ns;
     end process clock_gen;
 
-end architecture FD_tb_arch;
+end architecture UC_tb_arch;

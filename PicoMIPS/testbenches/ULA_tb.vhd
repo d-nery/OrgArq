@@ -128,6 +128,17 @@ begin
                 report "Error!"
                 severity error;
         end loop;
+
+        -- Test shif
+        control <= ULA_SLL;
+        in1 <= x"00000008";
+        in2 <= x"00001101";
+        wait for 5 ns;
+
+        assert result = x"00110100"
+            report "Error!"
+            severity error;
+
         report "End of ULA testbench";
         wait;
     end process;

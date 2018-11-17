@@ -128,7 +128,7 @@ begin
         new_woffset := 0;
 
         read_l: loop
-            mem_enable  <= '1';
+            mem_enable <= '1';
             mem_addr <= std_logic_vector(to_unsigned(next_addr, mem_addr'length));
 
             wait until mem_ready = '1';
@@ -137,10 +137,10 @@ begin
 
             if new_woffset = words_per_block - 1 then
                 exit read_l;
-                end if;
+            end if;
 
-                new_woffset  := new_woffset + 1;
-                next_addr := next_addr + 4;
+            new_woffset := new_woffset + 1;
+            next_addr := next_addr + 4;
             mem_enable <= '0';
             wait for 2 ns;
 

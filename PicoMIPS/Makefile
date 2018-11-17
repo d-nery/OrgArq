@@ -1,14 +1,14 @@
-##
 GHDL := ghdl
 WORKDIR := work
 VERSION := 08
 
 PACKAGES := pkgTypes.vhd pkgConstants.vhd # Manter essa ordem pq Constants usa types
-TARGETS  := add4.vhd MP.vhd mux2.vhd register_bank.vhd PC.vhd RI.vhd sign_extend.vhd ULA.vhd ICache.vhd DCache.vhd UC.vhd FD.vhd
+TARGETS  := add4.vhd MP.vhd mux2.vhd mux3.vhd register_bank.vhd PC.vhd RI.vhd sign_extend.vhd ULA.vhd ICache.vhd DCache.vhd UC.vhd FD.vhd
 
-TARGETS += $(wildcard */*.vhd)
+TARGETS += $(wildcard testbenches/*.vhd)
 
 DEBUG := 1
+VISUAL := 1
 
 GHDLFLAGS := --std=$(VERSION) --workdir=$(WORKDIR)
 
@@ -25,35 +25,63 @@ all_tests: mp_test pc_test ri_test ula_test instructions_test
 
 mp_test:
 	$(GHDL) -r $(GHDLFLAGS) MP_tb --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
+endif
 
 pc_test:
 	$(GHDL) -r $(GHDLFLAGS) PC_tb --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
+endif
 
 ri_test:
 	$(GHDL) -r $(GHDLFLAGS) RI_tb --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
+endif
 
 fd_test:
-	$(GHDL) -r $(GHDLFLAGS) FD_tb --stop-time=2500ns --vcd=$(WORKDIR)/$@.vcd
+	$(GHDL) -r $(GHDLFLAGS) FD_tb --stop-time=3000ns --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
+endif
 
 ula_test:
 	$(GHDL) -r $(GHDLFLAGS) ULA_tb --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
+endif
 
 icache_test:
 	$(GHDL) -r $(GHDLFLAGS) ICache_tb --stop-time=3us --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
+endif
 
 dcache_test:
 	$(GHDL) -r $(GHDLFLAGS) DCache_tb --stop-time=4500ns --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
+endif
 
 instructions_test:
 	$(GHDL) -r $(GHDLFLAGS) instruction_fetch_tb --stop-time=3us --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
+endif
+
+uc_test:
+	$(GHDL) -r $(GHDLFLAGS) UC_tb --stop-time=3us --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
+	gtkwave $(WORKDIR)/$@.vcd
+endif
+
+full_test:
+	$(GHDL) -r $(GHDLFLAGS) full_tb --stop-time=6us --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
+	gtkwave $(WORKDIR)/$@.vcd
+endif
 
 check_syntax: | $(WORKDIR)
 	$(GHDL) -s $(GHDLFLAGS) $(PACKAGES) $(TARGETS)

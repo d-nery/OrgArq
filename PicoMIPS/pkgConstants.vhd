@@ -34,9 +34,28 @@ package constants is
     constant FUNC_SLT:  std_logic_vector(5 downto 0) := "101010";
 
     -- ULA Operations
-    constant ULA_AND: nibble_t := "0000";
-    constant ULA_OR:  nibble_t := "0001";
-    constant ULA_ADD: nibble_t := "0010";
-    constant ULA_SUB: nibble_t := "0011";
-    constant ULA_SLT: nibble_t := "0100";
+    constant ULA_AND:  nibble_t := "0000";
+    constant ULA_OR:   nibble_t := "0001";
+    constant ULA_ADD:  nibble_t := "0010";
+    constant ULA_SUB:  nibble_t := "0011";
+    constant ULA_SLT:  nibble_t := "0100";
+    constant ULA_ADDU: nibble_t := "0101";
+    constant ULA_SLL:  nibble_t := "0110";
+
+    -- MUXES
+    constant MUX_MEM_DC: std_logic := '0';
+    constant MUX_MEM_IC: std_logic := '1';
+
+    constant MUX_RBWR_RT: std_logic := '0';
+    constant MUX_RBWR_RD: std_logic := '1';
+
+    constant MUX_ALUSRC1_RS:    std_logic := '0';
+    constant MUX_ALUSRC1_SHAMT: std_logic := '1';
+
+    constant MUX_ALUSRC2_RB:    std_logic := '0';
+    constant MUX_ALUSRC2_IMMED: std_logic := '1';
+
+
+    constant MUX_WB_ULA: std_logic := '0';
+    constant MUX_WB_DC:  std_logic := '1';
 end package constants;

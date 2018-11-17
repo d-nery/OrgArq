@@ -69,11 +69,16 @@ architecture MP_arch of MP is
     end function;
 
     signal main_memory: memory_t := parse_mp(filename => filen);
-
+    signal teste : word_t := (others => '0');
 begin
     -- byte index -> word index
     process (enable) begin
         if rising_edge(enable) then
+            -- assert to_integer(unsigned(address)) < 2**14
+            --     report "Address OOB: " & integer'image(to_integer(unsigned(address)));
+
+            -- teste <= std_logic_vector(resize(unsigned(address(13 downto 0)), teste'length));
+
             if mem_write = '0' then
                 data_o <= main_memory(to_integer(unsigned(address(31 downto 2)))) after Tread;
                 mem_ready <= '1' after Tread;

@@ -44,7 +44,7 @@ architecture ICache_arch of ICache is
     constant block_size: positive := 2**6;  -- 64 bytes/bloco
 
     constant words_per_block: positive := block_size / 4;
-    constant nb_blocks: positive := cache_size / block_size; -- 256 blocos
+    constant nb_blocks:       positive := cache_size / block_size; -- 256 blocos
 
     type set_t is array(0 to words_per_block - 1) of word_t; -- Palavras do bloco
     type entry_t is record -- Cache entries
@@ -59,8 +59,8 @@ architecture ICache_arch of ICache is
     type state_t is (INIT, SLEEP, GET_DATA, READ_MISS, DONE);
 
     signal cache: cache_t; -- actual cache
-    signal state: state_t := INIT;
-    signal s_hit: std_logic;
+    signal state: state_t   := INIT;
+    signal s_hit: std_logic := '0';
 begin
     cache_loop: process (clk)
         variable tag:          natural;

@@ -28,8 +28,9 @@ entity FD is
 
         reg_write:   in std_logic;
 
+        mux_alusrc1: in std_logic;
+        mux_alusrc2: in std_logic;
         mux_rbwr:    in std_logic;
-        mux_alusrc:  in std_logic;
         mux_wb:      in std_logic;
         mux_mem_src: in std_logic;
         mux_pcsrc1:  in std_logic;
@@ -46,54 +47,57 @@ end entity FD;
 
 architecture FD_arch of FD is
     -- PC
-    signal pc_addr:     word_t;
-    signal pc_addr_4:   word_t;
-    signal pc_new_addr: word_t;
+    signal pc_addr:     word_t := (others => '0');
+    signal pc_addr_4:   word_t := (others => '0');
+    signal pc_new_addr: word_t := (others => '0');
 
     -- Instruction Cache
-    signal icache_data:       word_t;
-    signal icache_mem_addr:   word_t;
-    signal icache_mem_enable: std_logic;
-    signal icache_mem_write:  std_logic;
+    signal icache_data:       word_t := (others => '0');
+    signal icache_mem_addr:   word_t := (others => '0');
+    signal icache_mem_enable: std_logic := '0';
+    signal icache_mem_write:  std_logic := '0';
 
     -- RI
     signal instruction:  instruction_t;
-    signal ri_rs:        std_logic_vector(4 downto 0);
-    signal ri_rt:        std_logic_vector(4 downto 0);
-    signal ri_rd:        std_logic_vector(4 downto 0);
-    signal ri_immed:     std_logic_vector(15 downto 0);
-    signal ri_jumpa:     std_logic_vector(25 downto 0);
-    signal ri_immed_ext: word_t;
+    signal ri_rs:        std_logic_vector(4  downto 0) := (others => '0');
+    signal ri_rt:        std_logic_vector(4  downto 0) := (others => '0');
+    signal ri_rd:        std_logic_vector(4  downto 0) := (others => '0');
+    signal ri_immed:     std_logic_vector(15 downto 0) := (others => '0');
+    signal ri_shamt:     std_logic_vector(4  downto 0) := (others => '0');
+    signal ri_jumpa:     std_logic_vector(25 downto 0) := (others => '0');
+    signal ri_shamt_ext: word_t := (others => '0');
+    signal ri_immed_ext: word_t := (others => '0');
 
     -- Register Bank
-    signal rb_write_index: std_logic_vector(4 downto 0);
-    signal rb_read1:       word_t;
-    signal rb_read2:       word_t;
-    signal rb_write_data:  word_t;
+    signal rb_write_index: std_logic_vector(4 downto 0) := (others => '0');
+    signal rb_read1:       word_t := (others => '0');
+    signal rb_read2:       word_t := (others => '0');
+    signal rb_write_data:  word_t := (others => '0');
 
     -- ULA
-    signal ula_src2: word_t;
-    signal ula_res:  word_t;
+    signal ula_src1: word_t := (others => '0');
+    signal ula_src2: word_t := (others => '0');
+    signal ula_res:  word_t := (others => '0');
 
     -- Data Cache
-    signal dcache_data: word_t;
-    signal dcache_mem_addr:   word_t;
-    signal dcache_mem_data:   word_t;
-    signal dcache_mem_enable: std_logic;
-    signal dcache_mem_write:  std_logic;
+    signal dcache_data:       word_t := (others => '0');
+    signal dcache_mem_addr:   word_t := (others => '0');
+    signal dcache_mem_data:   word_t := (others => '0');
+    signal dcache_mem_enable: std_logic := '0';
+    signal dcache_mem_write:  std_logic := '0';
 
     -- MP
-    signal mem_ready:   std_logic;
-    signal mem_enable:  std_logic;
-    signal mem_write:   std_logic;
-    signal mem_data:    word_t;
-    signal mem_address: word_t;
+    signal mem_ready:   std_logic := '0';
+    signal mem_enable:  std_logic := '0';
+    signal mem_write:   std_logic := '0';
+    signal mem_data:    word_t := (others => '0');
+    signal mem_address: word_t := (others => '0');
 
     -- outros
-    signal pcsrc1: word_t;
-    signal sll1:   word_t;
-    signal temp1:  word_t;
-    signal temp2:  word_t;
+    signal pcsrc1: word_t := (others => '0');
+    signal sll1:   word_t := (others => '0');
+    signal temp1:  word_t := (others => '0');
+    signal temp2:  word_t := (others => '0');
 
 begin
     R1: entity work.PC port map (
@@ -136,6 +140,7 @@ begin
     ri_rs    <= instruction.Rs;
     ri_rt    <= instruction.Rt;
     ri_rd    <= instruction.Rd;
+    ri_shamt <= instruction.shamt;
     funct    <= instruction.funct;
     ri_immed <= instruction.immed;
     ri_jumpa <= instruction.jumpa;
@@ -167,15 +172,29 @@ begin
         out1 => ri_immed_ext
     );
 
+    SE_shamt: entity work.sign_extend generic map (
+        in_n => 5
+    ) port map (
+        in1  => ri_shamt,
+        out1 => ri_shamt_ext
+    );
+
     M5: entity work.mux2 port map (
         in1    => rb_read2,
         in2    => ri_immed_ext,
         out1   => ula_src2,
-        choice => mux_alusrc
+        choice => mux_alusrc2
+    );
+
+    M9: entity work.mux2 port map (
+        in1    => rb_read1,
+        in2    => ri_shamt_ext,
+        out1   => ula_src1,
+        choice => mux_alusrc1
     );
 
     ULA1: entity work.ULA port map (
-        in1     => rb_read1,
+        in1     => ula_src1,
         in2     => ula_src2,
         control => ula_control,
         result  => ula_res,
