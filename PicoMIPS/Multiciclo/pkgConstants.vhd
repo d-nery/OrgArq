@@ -49,7 +49,7 @@ package constants is
     constant MUX_RBWR_RT: std_logic := '0';
     constant MUX_RBWR_RD: std_logic := '1';
 
-    constant MUX_ALUSRC1_RS:    std_logic := '0';
+    constant MUX_ALUSRC1_RB:    std_logic := '0';
     constant MUX_ALUSRC1_SHAMT: std_logic := '1';
 
     constant MUX_ALUSRC2_RB:    std_logic := '0';

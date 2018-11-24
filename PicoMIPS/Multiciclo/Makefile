@@ -78,7 +78,7 @@ ifeq ($(VISUAL), 1)
 endif
 
 full_test:
-	$(GHDL) -r $(GHDLFLAGS) full_tb --stop-time=6us --vcd=$(WORKDIR)/$@.vcd
+	$(GHDL) -r $(GHDLFLAGS) full_tb --stop-time=8us --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
