@@ -23,8 +23,6 @@ entity ICache is
         clk:    in std_logic;
         enable: in std_logic;
 
-        state_s: out std_logic_vector(2 downto 0);
-
         -- From UC/FD
         read_addr: in  word_t;
         data_out:  out word_t := (others => '0');
@@ -61,6 +59,10 @@ architecture ICache_arch of ICache is
     signal cache: cache_t; -- actual cache
     signal state: state_t   := INIT;
     signal s_hit: std_logic := '0';
+
+    -- Debug
+    signal state_s: std_logic_vector(2 downto 0) := "000";
+
 begin
     cache_loop: process (clk)
         variable tag:          natural;

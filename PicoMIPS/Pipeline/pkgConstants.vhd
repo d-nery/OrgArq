@@ -55,7 +55,6 @@ package constants is
     constant MUX_ALUSRC2_RB:    std_logic := '0';
     constant MUX_ALUSRC2_IMMED: std_logic := '1';
 
-
     constant MUX_WB_ULA: std_logic := '0';
     constant MUX_WB_DC:  std_logic := '1';
 end package constants;

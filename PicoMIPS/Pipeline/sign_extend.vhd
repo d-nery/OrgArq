@@ -26,5 +26,5 @@ end entity sign_extend;
 
 architecture sign_extend_arch of sign_extend is
 begin
-    out1 <= std_logic_vector(resize(signed(in1), out1'length));
+    out1 <= std_logic_vector(resize(unsigned(in1), out1'length));
 end architecture sign_extend_arch;
