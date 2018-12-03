@@ -32,12 +32,8 @@ architecture behavior of multb is
 begin
 	mul_portmap: mul port map (in1 => in1, in2 => in2, clk => clk, result => result);
 
-	in1 <= (others => '0');
-	in2 <= (others => '0');
-	partial <= (others => '0');
-	in1(0) <= '1';
-	in1(1) <= '1';
-	partial(0) <= '1';
+	in1 <= "00000000000000000000000000000011";
+	partial<= "00000000000000000000000000000001";
 
 	-- Clock process definitions( clock with 50% duty cycle is generated here.
 	clk_process :process
@@ -51,14 +47,14 @@ begin
 	-- Stimulus process
 	stim_proc: process
 	begin       
-		wait for clk_period;
-		in2(0)<= '1';
-		wait for clk_period;
-		in2(1) <= '1';
-		  wait for clk_period;
-		in2(2) <= '1';
+			wait for clk_period;
+		in2<= "00000000000000000000000000000001";
+			wait for clk_period;
+		in2 <= "00000000000000000000000000000010";
+			wait for clk_period;
+		in2<= "00000000000000000000000000000011";
 		assert false report "Reached end of test";
-		wait;
+			wait;
 	end process;
 
 end behavior;

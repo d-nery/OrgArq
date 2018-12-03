@@ -25,12 +25,12 @@ end entity mul;
 
 architecture mul_arch of mul is
 signal i: integer := 0;
-signal in1_p, in2_p, partial: std_logic_vector(31 downto 0) := (others =>'0');
-signal result_p, temp1, temp2: std_logic_vector(63 downto 0) := (others =>'0');
+signal in1_p, in2_p, partial, temp1, temp2: std_logic_vector(31 downto 0) := (others =>'0');
+signal result_p: std_logic_vector(63 downto 0) := (others =>'0');
 
 begin
 
-	partial(0) <= '1';
+	partial<= "00000000000000000000000000000001";
 	in1_p <= in1;
 	in2_p <= in2;
 	result <= result_p;
@@ -42,9 +42,9 @@ begin
 		--Implement the 3 stages pipeline multiplication
 			for i in 0 to 2 loop 
 				case i is 
-					when 0 => temp1 <= std_logic_vector(signed(in1_p)*signed(partial));
-					when 1 => temp2 <= std_logic_vector(signed(temp1)*signed(in2_p));
-					when 2 => result_p <= std_logic_vector(signed(temp2)*signed(partial));
+					when 0 => temp1 <= in1_p;
+					when 1 => temp2 <= in2_p;
+					when 2 => result_p <= std_logic_vector(signed(temp2)*signed(temp1));
 					when others => null;
 				end case;
 			end loop; 
