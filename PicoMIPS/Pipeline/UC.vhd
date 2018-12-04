@@ -1,4 +1,4 @@
--- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PCS3422 - Organizacao e Arquitetura de Computadores II
 -- PicoMIPS
 -- File: UC.vhd
 -- Author: Daniel Nery Silva de Oliveira
@@ -239,16 +239,16 @@ begin
                         ula_control <= ULA_ADD;
 
                         dcache_wr <= '0';
-                        
+
                     when others =>
                         d_current_execute_state <= "0000";
-                        
+
                 end case;
-                
+
             when DMEM_WAIT =>
                 dcache_en <= '1' after 10 ns;
                 d_current_state <= "0011";
-                
+
             when WRITE_BACK =>
                 dcache_en <= '0';
                 d_current_state <= "0100";

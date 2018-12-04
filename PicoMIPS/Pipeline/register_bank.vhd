@@ -1,4 +1,4 @@
--- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PCS3422 - Organizacao e Arquitetura de Computadores II
 -- PicoMIPS
 -- File: register_bank.vhd
 -- Author: Daniel Nery Silva de Oliveira
@@ -90,7 +90,7 @@ begin
             end if;
         end if;
     end process sync_write;
-            
+
     r1: process (clk, registers, read_index1)
     begin
         read_data1 <= registers(to_integer(unsigned(read_index1))) after Tread;

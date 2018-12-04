@@ -1,4 +1,4 @@
--- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PCS3422 - Organizacao e Arquitetura de Computadores II
 -- PicoMIPS
 -- File: mux3.vhd
 -- Author: Daniel Nery Silva de Oliveira

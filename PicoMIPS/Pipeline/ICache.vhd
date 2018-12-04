@@ -1,4 +1,4 @@
--- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PCS3422 - Organizacao e Arquitetura de Computadores II
 -- PicoMIPS
 -- File: ICache.vhd
 -- Author: Daniel Nery Silva de Oliveira
@@ -11,7 +11,6 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
-
 use work.constants.all;
 use work.types.all;
 
@@ -132,7 +131,7 @@ begin
                             uc_done            <= '1' after Taccess;
                             state <= DONE;
                         else
-                            word_offset := word_offset + 1;
+                            word_offset  := word_offset + 1;
                             mem_addr_tmp := std_logic_vector(to_unsigned(to_integer(unsigned(mem_addr_tmp)) + 4, mem_addr_tmp'length));
                             mem_addr     <= mem_addr_tmp;
                             mem_enable   <= '0', '1' after 1 ns;

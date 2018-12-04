@@ -5,6 +5,8 @@ VERSION := 08
 PACKAGES := pkgTypes.vhd pkgConstants.vhd # Manter essa ordem pq Constants usa types
 TARGETS  := add4.vhd MP.vhd mux2.vhd mux3.vhd register_bank.vhd PC.vhd RI.vhd sign_extend.vhd ULA.vhd ICache.vhd DCache.vhd UC.vhd FD.vhd
 
+TARGETS += $(wildcard stages/*.vhd)
+TARGETS += $(wildcard pipes/*.vhd)
 TARGETS += $(wildcard testbenches/*.vhd)
 
 DEBUG := 1
@@ -65,8 +67,14 @@ ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
 
-instructions_test:
+instruction_fetch_test:
 	$(GHDL) -r $(GHDLFLAGS) instruction_fetch_tb --stop-time=3us --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
+	gtkwave $(WORKDIR)/$@.vcd
+endif
+
+instruction_decode_test:
+	$(GHDL) -r $(GHDLFLAGS) instruction_decode_tb --stop-time=400ns --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif

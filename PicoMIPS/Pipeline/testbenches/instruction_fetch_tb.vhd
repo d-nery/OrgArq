@@ -1,4 +1,4 @@
--- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PCS3422 - Organizacao e Arquitetura de Computadores II
 -- PicoMIPS
 -- File: instruction_fetch_tb.vhd
 -- Author: Daniel Nery Silva de Oliveira
@@ -20,9 +20,6 @@ end entity instruction_fetch_tb;
 architecture instruction_arch of instruction_fetch_tb is
     signal clk:     std_logic := '0';
     signal pc_wr:   std_logic;
-    signal address: word_t;
-    signal instr:   word_t;
-    signal newPC:   word_t;
 
     signal decoded_instr: instruction_t;
 
@@ -44,52 +41,41 @@ architecture instruction_arch of instruction_fetch_tb is
     signal d_immed:  std_logic_vector(15 downto 00);
     signal d_jumpa:  std_logic_vector(25 downto 00);
 begin
-    PC0: entity work.PC port map (
+    instr_fetch: entity work.instruction_fetch port map (
         clk => clk,
-        new_address => newPC,
-        current_address => address,
+        rst => '0',
 
-        reset => '0',
-        wr => pc_wr
-    );
+        pc_wr => pc_wr,
 
-    U1: entity work.add4 port map(
-        in1  => address,
-        out1 => newPC
+        add_result => (others => '0'),
+        zero       => '0',
+        branch     => '0',
+
+        pc4 => open,
+
+        -- ICache
+        imem_enable => cache_en,
+        imem_done   => cache_done,
+        instruction => decoded_instr,
+
+        -- To/From MP
+        mem_data => s_data,
+        mem_rdy  => mem_ready,
+
+        mem_addr => s_addr,
+        mem_wr   => mem_write,
+        mem_en   => mem_enable
     );
 
     MP0: entity work.MP generic map (
         filen => "mp_teste_fetch.txt"
     ) port map (
-        address => s_addr,
-        data_o => s_data,
-        data_i => (others => '0'),
+        address   => s_addr,
+        data_o    => s_data,
+        data_i    => (others => '0'),
         mem_ready => mem_ready,
-        enable => mem_enable,
+        enable    => mem_enable,
         mem_write => mem_write
-    );
-
-    RI0: entity work.RI port map (
-        clk => clk,
-        new_instruction => instr,
-        instruction => decoded_instr
-    );
-
-    ICache0: entity work.ICache port map (
-        clk => clk,
-        enable => cache_en,
-
-        -- From UC/FD
-        read_addr => address,
-        data_out  => instr,
-        uc_done   => cache_done,
-
-        -- From MP
-        mem_addr   => s_addr,
-        mem_data   => s_data,
-        mem_ready  => mem_ready,
-        mem_enable => mem_enable,
-        mem_write  => mem_write
     );
 
     test: process
@@ -125,10 +111,6 @@ begin
             cache_en <= '0';
 
             wait for 5 ns;
-
-            assert instr = instructions(i)
-                report "instruction error"
-                    severity error;
 
             wait until cache_done = '0';
             wait for 5 ns;
