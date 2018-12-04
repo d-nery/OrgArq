@@ -1,4 +1,4 @@
--- PCS3412 - Organizacao e Arquitetura de Computadores I
+-- PCS3422 - Organizacao e Arquitetura de Computadores II
 -- PicoMIPS
 -- File:ULA.vhd
 -- Author: Daniel Nery Silva de Oliveira
@@ -62,5 +62,5 @@ begin
     begin
         zero <= '1' when result = x"00000000" else '0';
     end process;
-        
+
 end architecture ULA_arch;
