@@ -48,8 +48,10 @@ begin
         pc_wr => pc_wr,
 
         add_result => (others => '0'),
+        jump_addr  => (others => '0'),
         zero       => '0',
         branch     => '0',
+        jump       => '0',
 
         pc4 => open,
 

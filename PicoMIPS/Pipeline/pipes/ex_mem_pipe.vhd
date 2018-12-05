@@ -11,7 +11,6 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
-use work.constants.all;
 use work.types.all;
 
 entity ex_mem_pipe is
@@ -27,8 +26,8 @@ entity ex_mem_pipe is
         ex_ula_zero:  in  std_logic;
         mem_ula_zero: out std_logic;
 
-        ex_ula_result:  in  std_logic;
-        mem_ula_result: out std_logic;
+        ex_ula_result:  in  word_t;
+        mem_ula_result: out word_t;
 
         ex_reg_read2:  in  word_t;
         mem_reg_read2: out word_t;

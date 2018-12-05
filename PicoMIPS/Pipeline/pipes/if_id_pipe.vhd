@@ -11,7 +11,6 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
-use work.constants.all;
 use work.types.all;
 
 entity if_id_pipe is
@@ -29,5 +28,10 @@ end entity if_id_pipe;
 architecture if_id_pipe_arch of if_id_pipe is
 begin
     id_pc4 <= if_pc4;
-    id_instruction <= if_instruction;
+
+    signal_propagate: process
+    begin
+        wait until rising_edge(clk);
+        id_instruction <= if_instruction;
+    end process signal_propagate;
 end architecture if_id_pipe_arch;

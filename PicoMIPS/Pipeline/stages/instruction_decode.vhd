@@ -11,14 +11,13 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
-use work.constants.all;
 use work.types.all;
 
 entity instruction_decode is
     port (
         clk: in std_logic;
 
-        reg_write: in std_logic;
+        reg_write:       in std_logic;
         reg_write_index: in nibble_t;
         reg_write_data:  in word_t;
 
@@ -26,15 +25,15 @@ entity instruction_decode is
         reg_data2: out word_t;
 
         immed_ext: out word_t;
-        rt: out nibble_t;
-        rd: out nibble_t;
-        shamt: out std_logic_vector(04 downto 0);
-        jumpa: out word_t;
+        rt:        out nibble_t;
+        rd:        out nibble_t;
+        shamt:     out std_logic_vector(04 downto 0);
+        jumpa:     out word_t;
 
         instruction: in instruction_t;
 
         -- PC + 4
-        pc4: in word_t;
+        pc4: in word_t
     );
 end entity instruction_decode;
 

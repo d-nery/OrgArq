@@ -148,5 +148,4 @@ begin
             end case;
         end if;
     end process cache_loop;
-
 end architecture ICache_arch;

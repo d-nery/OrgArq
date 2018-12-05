@@ -75,7 +75,7 @@ begin
         dcache_en => dcache_en
     );
 
-    FD: entity work.FD port map (
+    FD: entity work.FD2 port map (
         clk => clk,
         rst => rst,
         pc_wr => pc_wr,
@@ -88,16 +88,18 @@ begin
 
         reg_write => reg_write,
 
-        mux_rbwr => mux_rbwr,
+        mux_rbwr    => mux_rbwr,
         mux_alusrc1 => mux_alusrc1,
         mux_alusrc2 => mux_alusrc2,
-        mux_wb => mux_wb,
+        mux_wb      => mux_wb,
         mux_mem_src => mux_mem_src,
-        mux_pcsrc1 => mux_pcsrc1,
-        mux_pcsrc2 => mux_pcsrc2,
+        mux_pcsrc1  => mux_pcsrc1,
+        mux_pcsrc2  => mux_pcsrc2,
 
         ula_zero => ula_zero,
         ula_control => ula_control,
+
+        branch => '0',
 
         dcache_ready => dcache_ready,
         dcache_wr => dcache_wr,

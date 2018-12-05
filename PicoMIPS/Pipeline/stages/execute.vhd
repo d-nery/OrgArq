@@ -11,7 +11,6 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
-use work.constants.all;
 use work.types.all;
 
 entity execute is
@@ -43,9 +42,9 @@ end entity execute;
 
 architecture execute_arch of execute is
     signal shamt_ext : word_t := (others => '0');
-    signal alu_in1 : word_t := (others => '0');
-    signal alu_in2 : word_t := (others => '0');
-    signal sll1:   word_t := (others => '0');
+    signal alu_in1 :   word_t := (others => '0');
+    signal alu_in2 :   word_t := (others => '0');
+    signal sll1:       word_t := (others => '0');
 
 begin
     SE_shamt: entity work.sign_extend generic map (
@@ -70,12 +69,20 @@ begin
     );
 
     M3: entity work.mux2 generic map (
-        n => 5
+        n => 4
     ) port map (
         in1    => rt,
         in2    => rd,
         out1   => wb_index,
         choice => wb_src
+    );
+
+    ULA: entity work.ULA port map (
+        in1     => alu_in1,
+        in2     => alu_in2,
+        control => alu_control,
+        result  => alu_result,
+        zero    => alu_zero
     );
 
     sll1  <= immed(29 downto 0) & "00";

@@ -81,6 +81,7 @@ begin
 
             if mem_write = '0' then
                 data_o <= main_memory(to_integer(unsigned(address(31 downto 2)))) after Tread;
+--                data_o <= main_memory(to_integer(unsigned(teste))) after Tread;
                 mem_ready <= '1' after Tread;
             elsif mem_write = '1' then
                 main_memory(to_integer(unsigned(address(31 downto 2)))) <= data_i after Twrite;

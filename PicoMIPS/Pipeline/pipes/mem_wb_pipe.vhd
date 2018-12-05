@@ -11,7 +11,6 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
-use work.constants.all;
 use work.types.all;
 
 entity mem_wb_pipe is
@@ -24,8 +23,8 @@ entity mem_wb_pipe is
         mem_ula_result: in  word_t;
         wb_ula_result:  out word_t;
 
-        mem_reg_write_index: in  word_t;
-        wb_reg_write_index:  out word_t
+        mem_reg_write_index: in  nibble_t;
+        wb_reg_write_index:  out nibble_t
     );
 end entity mem_wb_pipe;
 

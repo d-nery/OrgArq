@@ -11,7 +11,6 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
-use work.constants.all;
 use work.types.all;
 
 entity instruction_fetch is
@@ -76,7 +75,7 @@ begin
         in1    => jump_addr,
         in2    => new_pc_branch,
         out1   => new_pc,
-        choice => zero_and_branch
+        choice => jump
     );
 
     add4: entity work.add4 port map (
