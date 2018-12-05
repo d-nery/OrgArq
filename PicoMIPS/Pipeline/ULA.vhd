@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File:ULA.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Unidade Logico-Aritimetica com 5 operações
@@ -22,11 +25,12 @@ entity ULA is
         Tgate: in time := 1 ns
     );
     port (
-        in1, in2: in  word_t;
-        control:  in  nibble_t;
+        in1, in2: in  word_t := (others => '0');
+        control:  in  nibble_t := (others => '0');
+        shamt:    in  std_logic_vector(04 downto 0) := (others => '0');
 
-        result:   out word_t;
-        zero:     out std_logic
+        result:   out word_t := (others => '0');
+        zero:     out std_logic := '0'
     );
 end entity ULA;
 
@@ -46,7 +50,7 @@ begin
             when ULA_OR =>
                 result <= in1 or in2 after Tgate;
             when ULA_SLL =>
-                result <= std_logic_vector(shift_left(signed(in2), to_integer(unsigned(in1)))) after Tgate;
+                result <= std_logic_vector(shift_left(signed(in2), to_integer(unsigned(shamt)))) after Tgate;
             when ULA_SLT =>
                 if in1 < in2 then
                     result <= x"00000001" after Tsoma;

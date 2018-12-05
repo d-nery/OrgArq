@@ -49,7 +49,9 @@ begin
         rd        => rd,
         shamt     => shamt,
 
-        instruction => instruction
+        instruction => instruction,
+
+        pc4 => (others => '0')
     );
 
     test: process

@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: register_bank.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Contem os registradores de uso geral e registradores
@@ -28,17 +31,17 @@ entity register_bank is
     );
     port (
         clk:         in  std_logic;
-        reg_write:   in  std_logic;
+        reg_write:   in  std_logic := '0';
 
-        write_index: in  nibble_t;
+        write_index: in  nibble_t := (others => '0');
 
-        read_index1: in  nibble_t;
-        read_index2: in  nibble_t;
+        read_index1: in  nibble_t := (others => '0');
+        read_index2: in  nibble_t := (others => '0');
 
-        write_data:  in  word_t;
+        write_data:  in  word_t := (others => '0');
 
-        read_data1:  out word_t;
-        read_data2:  out word_t
+        read_data1:  out word_t := (others => '0');
+        read_data2:  out word_t := (others => '0')
     );
 end entity register_bank;
 

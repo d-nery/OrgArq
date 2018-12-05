@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: instruction_fetch.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Estágio de decodificação de instruções
@@ -11,30 +14,29 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
-use work.constants.all;
 use work.types.all;
 
 entity instruction_decode is
     port (
         clk: in std_logic;
 
-        reg_write: in std_logic;
-        reg_write_index: in nibble_t;
-        reg_write_data:  in word_t;
+        reg_write:       in std_logic := '0';
+        reg_write_index: in nibble_t  := (others => '0');
+        reg_write_data:  in word_t    := (others => '0');
 
-        reg_data1: out word_t;
-        reg_data2: out word_t;
+        reg_data1: out word_t := (others => '0');
+        reg_data2: out word_t := (others => '0');
 
-        immed_ext: out word_t;
-        rt: out nibble_t;
-        rd: out nibble_t;
-        shamt: out std_logic_vector(04 downto 0);
-        jumpa: out word_t;
+        immed_ext: out word_t                        := (others => '0');
+        rt:        out nibble_t                      := (others => '0');
+        rd:        out nibble_t                      := (others => '0');
+        shamt:     out std_logic_vector(04 downto 0) := (others => '0');
+        jumpa:     out word_t                        := (others => '0');
 
         instruction: in instruction_t;
 
         -- PC + 4
-        pc4: in word_t;
+        pc4: in word_t := (others => '0')
     );
 end entity instruction_decode;
 

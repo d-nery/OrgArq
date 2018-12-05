@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: instruction_fetch.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Estágio de busca de instruções
@@ -11,7 +14,6 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
-use work.constants.all;
 use work.types.all;
 
 entity instruction_fetch is
@@ -19,29 +21,27 @@ entity instruction_fetch is
         clk: in std_logic;
         rst: in std_logic;
 
-        pc_wr: in std_logic;
+        pc_wr: in std_logic := '1';
 
-        add_result: in word_t;
-        jump_addr:  in word_t;
-        zero:       in std_logic;
-        branch:     in std_logic;
-        jump:       in std_logic;
+        add_result: in word_t := (others => '0');
+        jump_addr:  in word_t := (others => '0');
+        zero:       in std_logic := '0';
+        branch:     in std_logic := '0';
+        jump:       in std_logic := '1';
 
-        pc4: out word_t;
+        pc4: out word_t := (others => '0') ;
 
         instruction: out instruction_t;
 
-        -- ICache
-        imem_enable: in std_logic;
-        imem_done:   out std_logic;
+        ic_stall: out std_logic;
 
         -- To/From MP
-        mem_data:    in word_t;
-        mem_rdy:     in std_logic;
+        mem_data:    in word_t := (others => '0');
+        mem_rdy:     in std_logic := '0';
 
-        mem_addr:    out word_t;
-        mem_wr:      out std_logic;
-        mem_en:      out std_logic
+        mem_addr:    out word_t := (others => '0');
+        mem_wr:      out std_logic := '0';
+        mem_en:      out std_logic := '0'
     );
 end entity instruction_fetch;
 
@@ -53,6 +53,10 @@ architecture instruction_fetch_arch of instruction_fetch is
 
     signal zero_and_branch : std_logic := '0';
     signal new_instruction : word_t := (others => '0');
+
+     -- ICache
+     signal imem_enable: std_logic := '0';
+     signal imem_done:   std_logic := '0';
 begin
     PC: entity work.PC port map (
         clk             => clk,
@@ -76,12 +80,21 @@ begin
         in1    => jump_addr,
         in2    => new_pc_branch,
         out1   => new_pc,
-        choice => zero_and_branch
+        choice => jump
     );
 
     add4: entity work.add4 port map (
         in1  => current_pc,
         out1 => pc_plus_4
+    );
+
+    ICC: entity work.IC_control port map (
+        pc_value => current_pc,
+
+        ic_done  => imem_done,
+        ic_en    => imem_enable,
+
+        ic_stall => ic_stall
     );
 
     ICache: entity work.ICache port map (

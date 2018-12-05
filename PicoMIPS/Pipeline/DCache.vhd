@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: ICache.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Cache para Memoria de Dados
@@ -24,20 +27,20 @@ entity DCache is
         clk:    in std_logic;
 
         -- From/To UC/FD
-        uc_enable: in  std_logic;
-        uc_write:  in  std_logic;
-        uc_addr:   in  word_t;
-        uc_ready:  out std_logic;
-        uc_data_o: out word_t;
-        uc_data_i: in  word_t;
+        uc_enable: in  std_logic := '0';
+        uc_write:  in  std_logic := '0';
+        uc_addr:   in  word_t := (others => '0');
+        uc_ready:  out std_logic := '0';
+        uc_data_o: out word_t := (others => '0');
+        uc_data_i: in  word_t := (others => '0');
 
         -- From/To Memory
-        mem_enable: out std_logic;
-        mem_write:  out std_logic;
-        mem_ready:  in  std_logic;
-        mem_addr:   out word_t;
-        mem_data_o: out word_t;
-        mem_data_i: in  word_t
+        mem_enable: out std_logic := '0';
+        mem_write:  out std_logic := '0';
+        mem_ready:  in  std_logic := '0';
+        mem_addr:   out word_t := (others => '0');
+        mem_data_o: out word_t := (others => '0');
+        mem_data_i: in  word_t := (others => '0')
     );
 end entity DCache;
 

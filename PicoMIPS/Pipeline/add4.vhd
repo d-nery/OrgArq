@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: add4.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     -Somador fixo em 4 unidades
@@ -19,8 +22,8 @@ entity add4 is
         Tsoma: in time := 2 ns
     );
     port (
-        in1:  in  word_t;
-        out1: out word_t
+        in1:  in  word_t := (others => '0');
+        out1: out word_t := (others => '0')
     );
 end entity add4;
 

@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: write_back.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Estágio de memória de dados
@@ -11,16 +14,15 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 library work;
-use work.constants.all;
 use work.types.all;
 
 entity write_back is
     port (
-        alu_res: in word_t;
-        dmem_data: in word_t;
+        alu_res:   in word_t := (others => '0');
+        dmem_data: in word_t := (others => '0');
 
-        reg_write_data: out word_t;
-        mux_src: in std_logic
+        reg_write_data: out word_t := (others => '0');
+        mux_src:        in  std_logic := '0'
     );
 end entity write_back;
 

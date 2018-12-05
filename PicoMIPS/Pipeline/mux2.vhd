@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: mux2.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Multiplexador de duas entradas
@@ -16,9 +19,9 @@ entity mux2 is
         Tdata: in time    := 0.5 ns
     );
     port (
-        in1, in2: in std_logic_vector(n - 1 downto 0);
-        out1:     out std_logic_vector(n - 1 downto 0);
-        choice:   in std_logic
+        in1, in2: in std_logic_vector(n - 1 downto 0) := (others => '0');
+        out1:     out std_logic_vector(n - 1 downto 0) := (others => '0');
+        choice:   in std_logic := '0'
     );
 end entity mux2;
 

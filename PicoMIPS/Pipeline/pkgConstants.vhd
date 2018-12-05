@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: pkgConstants.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Define constantes para o projeto
@@ -32,6 +35,12 @@ package constants is
     constant FUNC_ADD:  std_logic_vector(5 downto 0) := "100000";
     constant FUNC_ADDU: std_logic_vector(5 downto 0) := "100001";
     constant FUNC_SLT:  std_logic_vector(5 downto 0) := "101010";
+
+    -- ULA Control Operations
+    constant ULAC_ADD:    std_logic_vector(1 downto 0) := "00";
+    constant ULAC_BRANCH: std_logic_vector(1 downto 0) := "01";
+    constant ULAC_RTYPE:  std_logic_vector(1 downto 0) := "10";
+    constant ULAC_SLT:    std_logic_vector(1 downto 0) := "11";
 
     -- ULA Operations
     constant ULA_AND:  nibble_t := "0000";

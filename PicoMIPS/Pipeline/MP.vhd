@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: MP.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Contem a inicializacao da memoria principal do projetos
@@ -25,12 +28,19 @@ entity MP is
         Twrite: in time := 50 ns
     );
     port (
-        address:   in  word_t;
-        data_i:    in  word_t;
-        data_o:    out word_t;
+        -- Normal port
+        address:   in  word_t := (others => '0');
+        data_i:    in  word_t := (others => '0');
+        data_o:    out word_t := (others => '0');
         mem_ready: out std_logic := '0';
-        enable:    in  std_logic;
-        mem_write: in  std_logic
+        enable:    in  std_logic := '0';
+        mem_write: in  std_logic := '0';
+
+        -- Read-Only port
+        ro_addr:   in  word_t := (others => '0');
+        ro_data_o: out word_t := (others => '0');
+        ro_ready:  out std_logic := '0';
+        ro_en:     in  std_logic := '0'
     );
 end entity MP;
 
@@ -69,27 +79,32 @@ architecture MP_arch of MP is
     end function;
 
     signal main_memory: memory_t := parse_mp(filename => filen);
-    signal teste : word_t := (others => '0');
 begin
     -- byte index -> word index
     process (enable) begin
         if rising_edge(enable) then
-            -- assert to_integer(unsigned(address)) < 2**14
-            --     report "Address OOB: " & integer'image(to_integer(unsigned(address)));
-
-            -- teste <= std_logic_vector(resize(unsigned(address(13 downto 0)), teste'length));
-
             if mem_write = '0' then
-                data_o <= main_memory(to_integer(unsigned(address(31 downto 2)))) after Tread;
+                data_o <= main_memory(to_integer(unsigned(address(15 downto 2)))) after Tread;
                 mem_ready <= '1' after Tread;
             elsif mem_write = '1' then
-                main_memory(to_integer(unsigned(address(31 downto 2)))) <= data_i after Twrite;
+                main_memory(to_integer(unsigned(address(15 downto 2)))) <= data_i after Twrite;
                 mem_ready <= '1' after Twrite;
             end if;
         end if;
 
         if falling_edge(enable) then
             mem_ready <= '0';
+        end if;
+    end process;
+
+    process (ro_en) begin
+        if rising_edge(ro_en) then
+            ro_data_o <= main_memory(to_integer(unsigned(ro_addr(15 downto 2)))) after Tread;
+            ro_ready <= '1' after Tread;
+        end if;
+
+        if falling_edge(ro_en) then
+            ro_ready <= '0';
         end if;
     end process;
 end architecture MP_arch;
