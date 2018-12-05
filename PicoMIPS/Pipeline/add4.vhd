@@ -19,8 +19,8 @@ entity add4 is
         Tsoma: in time := 2 ns
     );
     port (
-        in1:  in  word_t;
-        out1: out word_t
+        in1:  in  word_t := (others => '0');
+        out1: out word_t := (others => '0')
     );
 end entity add4;
 

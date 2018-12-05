@@ -17,26 +17,26 @@ entity execute is
     port (
         clk: in std_logic;
 
-        pc4:         in  word_t;
-        branch_addr: out word_t;
+        pc4:         in  word_t := (others => '0');
+        branch_addr: out word_t := (others => '0');
 
-        shamt:  in std_logic_vector(04 downto 0);
-        rdata1: in word_t;
-        rdata2: in word_t;
-        immed:  in word_t;
+        shamt:  in std_logic_vector(04 downto 0) := (others => '0');
+        rdata1: in word_t := (others => '0');
+        rdata2: in word_t := (others => '0');
+        immed:  in word_t := (others => '0');
 
-        alu_control: in  nibble_t;
-        alu_result:  out word_t;
-        alu_zero:    out std_logic;
+        alu_control: in  nibble_t  := (others => '0');
+        alu_result:  out word_t    := (others => '0');
+        alu_zero:    out std_logic := '0';
 
-        alu_src1:    in std_logic;
-        alu_src2:    in std_logic;
+        alu_src1:    in std_logic := '0';
+        alu_src2:    in std_logic := '0';
 
-        rt: in nibble_t;
-        rd: in nibble_t;
+        rt: in nibble_t := (others => '0');
+        rd: in nibble_t := (others => '0');
 
-        wb_src:   in  std_logic;
-        wb_index: out nibble_t
+        wb_src:   in  std_logic := '0';
+        wb_index: out nibble_t  := (others => '0')
     );
 end entity execute;
 

@@ -16,9 +16,10 @@ use work.types.all;
 entity if_id_pipe is
     port (
         clk: in std_logic;
+        stall: in std_logic := '0';
 
-        if_pc4: in  word_t;
-        id_pc4: out word_t;
+        if_pc4: in  word_t := (others => '0');
+        id_pc4: out word_t := (others => '0');
 
         if_instruction: in  instruction_t;
         id_instruction: out instruction_t
@@ -27,11 +28,11 @@ end entity if_id_pipe;
 
 architecture if_id_pipe_arch of if_id_pipe is
 begin
-    id_pc4 <= if_pc4;
-
-    signal_propagate: process
+    signal_propagate: process (clk)
     begin
-        wait until rising_edge(clk);
-        id_instruction <= if_instruction;
+        if rising_edge(clk) and (stall = '0') then
+            id_pc4 <= if_pc4;
+            id_instruction <= if_instruction;
+        end if;
     end process signal_propagate;
 end architecture if_id_pipe_arch;

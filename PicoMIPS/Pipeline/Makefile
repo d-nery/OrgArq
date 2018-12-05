@@ -6,12 +6,13 @@ PACKAGES := pkgTypes.vhd pkgConstants.vhd # Manter essa ordem pq Constants usa t
 TARGETS :=
 TARGETS += add4.vhd MP.vhd mux2.vhd mux3.vhd               \
 	register_bank.vhd PC.vhd RI.vhd sign_extend.vhd        \
-	ULA.vhd ICache.vhd DCache.vhd UC.vhd
+	ULA.vhd ICache.vhd DCache.vhd ULA_control.vhd          \
+	IC_control.vhd
 
 TARGETS += $(wildcard stages/*.vhd)
 TARGETS += $(wildcard pipes/*.vhd)
 
-TARGETS += FD.vhd FD2.vhd
+TARGETS += UC2.vhd FD.vhd
 
 TARGETS += $(wildcard testbenches/*.vhd)
 

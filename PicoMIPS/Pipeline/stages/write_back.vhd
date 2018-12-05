@@ -15,11 +15,11 @@ use work.types.all;
 
 entity write_back is
     port (
-        alu_res: in word_t;
-        dmem_data: in word_t;
+        alu_res:   in word_t := (others => '0');
+        dmem_data: in word_t := (others => '0');
 
-        reg_write_data: out word_t;
-        mux_src: in std_logic
+        reg_write_data: out word_t := (others => '0');
+        mux_src:        in  std_logic := '0'
     );
 end entity write_back;
 

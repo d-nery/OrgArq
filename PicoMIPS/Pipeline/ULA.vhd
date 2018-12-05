@@ -22,11 +22,11 @@ entity ULA is
         Tgate: in time := 1 ns
     );
     port (
-        in1, in2: in  word_t;
-        control:  in  nibble_t;
+        in1, in2: in  word_t := (others => '0');
+        control:  in  nibble_t := (others => '0');
 
-        result:   out word_t;
-        zero:     out std_logic
+        result:   out word_t := (others => '0');
+        zero:     out std_logic := '0'
     );
 end entity ULA;
 

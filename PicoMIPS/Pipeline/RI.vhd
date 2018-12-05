@@ -21,7 +21,7 @@ entity RI is
     );
     port (
         clk:             in  std_logic;
-        new_instruction: in  word_t;
+        new_instruction: in  word_t := (others => '0');
         instruction:     out instruction_t
     );
 end entity RI;

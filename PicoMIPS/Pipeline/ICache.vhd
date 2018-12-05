@@ -23,16 +23,16 @@ entity ICache is
         enable: in std_logic;
 
         -- From UC/FD
-        read_addr: in  word_t;
+        read_addr: in  word_t := (others => '0');
         data_out:  out word_t := (others => '0');
-        uc_done:   out std_logic;
+        uc_done:   out std_logic := '0';
 
         -- From MP
         mem_addr:   out word_t := (others => '0');
-        mem_data:   in  word_t;
-        mem_ready:  in  std_logic;
-        mem_enable: out std_logic;
-        mem_write:  out std_logic
+        mem_data:   in  word_t := (others => '0');
+        mem_ready:  in  std_logic := '0';
+        mem_enable: out std_logic := '0';
+        mem_write:  out std_logic := '0'
     );
 end entity ICache;
 
@@ -63,7 +63,7 @@ architecture ICache_arch of ICache is
     signal state_s: std_logic_vector(2 downto 0) := "000";
 
 begin
-    cache_loop: process (clk)
+    cache_loop: process (clk, enable)
         variable tag:          natural;
         variable index:        natural range 0 to nb_blocks - 1;
         variable offset:       natural range 0 to words_per_block - 1;
@@ -72,7 +72,7 @@ begin
         variable hit:          boolean;
         variable mem_addr_tmp: word_t := (others => '0');
     begin
-        if rising_edge(clk) then
+        if rising_edge(clk) or enable'event then
             case state is
                 when INIT =>
                     state_s <= "000";
@@ -83,14 +83,38 @@ begin
                     state <= SLEEP;
 
                 when SLEEP =>
-                    state_s <= "001";
+                    state_s  <= "001";
                     uc_done  <= '0';
                     s_hit    <= '0';
                     hit      := false;
                     word_offset := 0;
                     mem_enable <= '0';
+
                     if enable = '1' then
-                        state <= GET_DATA;
+                        --state <= GET_DATA;
+                        cpu_addr := to_integer(unsigned(read_addr));
+
+                        offset := (cpu_addr mod block_size) / 4;
+                        index  := (cpu_addr / block_size) mod nb_blocks;
+                        tag    := cpu_addr / block_size / nb_blocks;
+
+                        -- Check hit
+                        if (cache(index).valid = true and cache(index).tag = tag) then
+                            hit   := true;
+                            s_hit <= '1';
+                        end if;
+
+                        if hit then
+                            data_out <= cache(index).data(offset) after Taccess;
+                            uc_done <= '1' after Taccess, '0' after 2*Taccess;
+                            --state <= DONE;
+                            mem_enable <= '0';
+                        else -- MISS
+                            mem_addr_tmp := std_logic_vector(to_unsigned((to_integer(unsigned(read_addr)) / block_size) * block_size, mem_addr_tmp'length));
+                            state        <= READ_MISS;
+                            mem_addr     <= mem_addr_tmp;
+                            mem_enable   <= '1';
+                        end if;
                     end if;
 
                 when GET_DATA =>

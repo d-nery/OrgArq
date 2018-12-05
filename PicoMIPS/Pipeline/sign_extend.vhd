@@ -19,8 +19,8 @@ entity sign_extend is
         in_n: integer := 16
     );
     port (
-        in1:  in  std_logic_vector(in_n - 1 downto 0);
-        out1: out word_t
+        in1:  in  std_logic_vector(in_n - 1 downto 0) := (others => '0');
+        out1: out word_t := (others => '0')
     );
 end entity sign_extend;
 

@@ -21,11 +21,11 @@ entity PC is
     );
     port (
         clk:             in  std_logic;
-        new_address:     in  word_t;
-        current_address: out word_t;
+        new_address:     in  word_t := (others => '0');
+        current_address: out word_t := (others => '0');
 
-        reset: in std_logic;
-        wr:    in std_logic
+        reset: in std_logic := '0';
+        wr:    in std_logic := '0'
     );
 end entity PC;
 
