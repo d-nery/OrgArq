@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: instruction_fetch.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Estágio de execução
@@ -42,30 +45,15 @@ end entity execute;
 
 architecture execute_arch of execute is
     signal shamt_ext : word_t := (others => '0');
-    signal alu_in1 :   word_t := (others => '0');
     signal alu_in2 :   word_t := (others => '0');
     signal sll1:       word_t := (others => '0');
 
 begin
-    SE_shamt: entity work.sign_extend generic map (
-        in_n => 5
-    ) port map (
-        in1  => shamt,
-        out1 => shamt_ext
-    );
-
     M1: entity work.mux2 port map (
         in1    => rdata2,
         in2    => immed,
         out1   => alu_in2,
         choice => alu_src2
-    );
-
-    M2: entity work.mux2 port map (
-        in1    => rdata1,
-        in2    => shamt_ext,
-        out1   => alu_in1,
-        choice => alU_src1
     );
 
     M3: entity work.mux2 generic map (
@@ -78,8 +66,9 @@ begin
     );
 
     ULA: entity work.ULA port map (
-        in1     => alu_in1,
+        in1     => rdata1,
         in2     => alu_in2,
+        shamt   => shamt,
         control => alu_control,
         result  => alu_result,
         zero    => alu_zero

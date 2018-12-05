@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: id_ex_pipe.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Instruction Decode <-> Execute
@@ -49,9 +52,6 @@ entity id_ex_pipe is
         id_alu_op: in  std_logic_vector(1 downto 0) := (others => '0');
         ex_alu_op: out std_logic_vector(1 downto 0) := (others => '0');
 
-        id_alusrc1: in  std_logic := '0';
-        ex_alusrc1: out std_logic := '0';
-
         id_alusrc2: in  std_logic := '0';
         ex_alusrc2: out std_logic := '0';
 
@@ -95,7 +95,6 @@ begin
             ex_funct        <= id_funct;
 
             ex_alu_op       <= id_alu_op;
-            ex_alusrc1      <= id_alusrc1;
             ex_alusrc2      <= id_alusrc2;
             ex_rb_write_src <= id_rb_write_src;
             ex_jump         <= id_jump;

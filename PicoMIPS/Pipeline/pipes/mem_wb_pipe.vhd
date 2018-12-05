@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: mem_wb_pipe.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Memory <-> Write Back

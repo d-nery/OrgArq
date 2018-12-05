@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: sign_extend.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Extende 16 bits para 32 bits, considerando o sinal

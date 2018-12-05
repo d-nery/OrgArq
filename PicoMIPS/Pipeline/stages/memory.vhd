@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: memory.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Estágio de memória de dados
@@ -21,9 +24,10 @@ entity memory is
         uc_enable: in  std_logic := '0';
         uc_write:  in  std_logic := '0';
         uc_addr:   in  word_t := (others => '0');
-        uc_ready:  out std_logic := '0';
         uc_data_o: out word_t := (others => '0');
         uc_data_i: in  word_t := (others => '0');
+
+        dc_stall: out std_logic := '0';
 
         -- From/To Memory
         mem_enable: out std_logic := '0';
@@ -36,15 +40,26 @@ entity memory is
 end entity memory;
 
 architecture memory_arch of memory is
-
+    signal dc_ready:  std_logic := '0';
+    signal dc_enable: std_logic := '0';
 begin
+    DCC: entity work.DC_Control port map (
+        uc_address => uc_addr,
+
+        uc_en   => uc_enable,
+        dc_en   => dc_enable,
+        dc_done => dc_ready,
+
+        dc_stall => dc_stall
+    );
+
     DCache: entity work.DCache port map (
         clk => clk,
 
-        uc_enable => uc_enable,
+        uc_enable => dc_enable,
         uc_write  => uc_write,
         uc_addr   => uc_addr,
-        uc_ready  => uc_ready,
+        uc_ready  => dc_ready,
         uc_data_o => uc_data_o,
         uc_data_i => uc_data_i,
 

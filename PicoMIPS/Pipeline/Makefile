@@ -7,12 +7,12 @@ TARGETS :=
 TARGETS += add4.vhd MP.vhd mux2.vhd mux3.vhd               \
 	register_bank.vhd PC.vhd RI.vhd sign_extend.vhd        \
 	ULA.vhd ICache.vhd DCache.vhd ULA_control.vhd          \
-	IC_control.vhd
+	IC_control.vhd DC_control.vhd
 
 TARGETS += $(wildcard stages/*.vhd)
 TARGETS += $(wildcard pipes/*.vhd)
 
-TARGETS += UC2.vhd FD.vhd
+TARGETS += UC.vhd FD.vhd
 
 TARGETS += $(wildcard testbenches/*.vhd)
 

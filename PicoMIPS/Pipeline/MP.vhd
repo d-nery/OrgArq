@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: MP.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Contem a inicializacao da memoria principal do projetos

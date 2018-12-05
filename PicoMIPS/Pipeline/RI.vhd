@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: ri.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Contem o registrador de instrucoes (RI), que e composto

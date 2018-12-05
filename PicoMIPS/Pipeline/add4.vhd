@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: add4.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     -Somador fixo em 4 unidades

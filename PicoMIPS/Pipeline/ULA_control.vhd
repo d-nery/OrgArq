@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: ULA_Control.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Entidade da Unidade de Controle da ULA

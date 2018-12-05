@@ -2,6 +2,9 @@
 -- PicoMIPS
 -- File: FD.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
 --     Entidade do Fluxo de Dados
@@ -134,10 +137,11 @@ architecture FD_arch of FD is
     signal icache_mem_ready:  std_logic := '0';
 
     signal ic_stall: std_logic := '0'; -- Stalling signal from ICache
+    signal dc_stall: std_logic := '0';
     signal pipe_stalling: std_logic := '0';
     signal pc_wr: std_logic := '0';
 begin
-    pipe_stalling <= ic_stall;
+    pipe_stalling <= ic_stall or dc_stall;
     pc_wr <= not pipe_stalling;
 
     IF0: entity work.instruction_fetch port map (
@@ -200,7 +204,7 @@ begin
         pc4 => id_pc4
     );
 
-    UC: entity work.UC2 port map (
+    UC: entity work.UC port map (
         clk   => clk,
         rst   => rst,
 
@@ -208,7 +212,6 @@ begin
 
         reg_write => id_reg_write,
 
-        mux_alusrc1 => id_alusrc1,
         mux_alusrc2 => id_alusrc2,
         mux_rbwr    => id_rb_write_src,
         mux_wb      => id_reg_wr_src,
@@ -255,9 +258,6 @@ begin
 
         id_alu_op => id_alu_op,
         ex_alu_op => ex_alu_op,
-
-        id_alusrc1 => id_alusrc1,
-        ex_alusrc1 => ex_alusrc1,
 
         id_alusrc2 => id_alusrc2,
         ex_alusrc2 => ex_alusrc2,
@@ -362,10 +362,11 @@ begin
 
         uc_enable => mem_dcache_en,
         uc_write  => mem_dcache_wr,
-        uc_ready  => dcache_ready,
         uc_addr   => mem_ula_result,
         uc_data_o => mem_dcache_data,
         uc_data_i => mem_reg_read2,
+
+        dc_stall  => dc_stall,
 
         mem_enable => dcache_mem_enable,
         mem_write  => dcache_mem_write,

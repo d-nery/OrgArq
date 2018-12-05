@@ -2,9 +2,12 @@
 -- PicoMIPS
 -- File: IC_Control.vhd
 -- Author: Daniel Nery Silva de Oliveira
+-- Collaboration: Beatriz de Oliveira Silva
+-- Collaboration: Bruno Henrique Vasconcelos Lemos
+-- Collaboration: João Raphael de Souza Morales
 --
 -- Description:
---     Entidade da Unidade de Controle da ULA
+--     Entidade da Unidade de Controle do Cache de Instruções
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -16,7 +19,7 @@ use work.types.all;
 
 entity IC_control is
     port (
-        pc_value: in word_t := (others => 'U');
+        pc_value: in word_t := (others => '0');
 
         ic_done: in  std_logic := '0';
         ic_en:   out std_logic := '0';
