@@ -1,10 +1,10 @@
-# PicoMIPS Serial - Organização e Arquitetura de Computadores I
+# PicoMIPS Serial - Organização e Arquitetura de Computadores II
 
-Projeto em VHDL de um processador MIPS32 com simplificações para a disciplina Organização e Arquitetura de Computadores I
+Projeto em VHDL de um processador MIPS32 com simplificações para a disciplina Organização e Arquitetura de Computadores I e II
 
 Escola Politécnica da USP
 
-Primeiro Semestre de 2018
+2018
 
 --------------------
 
@@ -16,5 +16,5 @@ Alunos:
 
 Pastas:
 * PicoMIPS -> Projeto em VHDL 08 testado com GHDL
-* Diagramas -> Diagramas relacionados ao projeto
-* Assemblies -> Programas asm de testes para o simulador QtSPIM
+  * Multiciclo -> Projeto sem pipeline
+  * Pipeline -> Projeto com pipeline (Tratamento de dependências não implementado)

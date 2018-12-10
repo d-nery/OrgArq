@@ -24,16 +24,17 @@ architecture behavior of multb is
    --declare inputs and initialize them
    signal clk : std_logic := '0';
    signal i: integer := 0;
-   signal in1, in2, partial: std_logic_vector(31 downto 0);
-   signal result: std_logic_vector(63 downto 0); 
+   signal in1, in2, partial: std_logic_vector(31 downto 0) := (others => '0');
+   signal result: std_logic_vector(63 downto 0);
    -- Clock period definitions
    constant clk_period : time := 10 ns;
-    
-begin
-	mul_portmap: mul port map (in1 => in1, in2 => in2, clk => clk, result => result);
 
-	in1 <= "00000000000000000000000000000011";
-	partial<= "00000000000000000000000000000001";
+begin
+	--in1 <= "00000000000000000000000000000011";
+	--partial<= "00000000000000000000000000000001";
+	--in2 <= "00000000000000000000000000000010";
+
+	mul_portmap: mul port map (in1 => in1, in2 => in2, clk => clk, result => result);
 
 	-- Clock process definitions( clock with 50% duty cycle is generated here.
 	clk_process :process
@@ -46,13 +47,14 @@ begin
 
 	-- Stimulus process
 	stim_proc: process
-	begin       
-			wait for clk_period;
-		in2<= "00000000000000000000000000000001";
-			wait for clk_period;
+	begin
+		in1 <= "00000000000000000000000000000011";
+		wait for clk_period;
+		in2 <= "00000000000000000000000000000001";
+		wait for clk_period;
 		in2 <= "00000000000000000000000000000010";
-			wait for clk_period;
-		in2<= "00000000000000000000000000000011";
+		wait for clk_period;
+		in2 <= "00000000000000000000000000000011";
 		assert false report "Reached end of test";
 			wait;
 	end process;

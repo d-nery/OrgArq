@@ -7,7 +7,7 @@ TARGETS :=
 TARGETS += add4.vhd MP.vhd mux2.vhd mux3.vhd               \
 	register_bank.vhd PC.vhd RI.vhd sign_extend.vhd        \
 	ULA.vhd ICache.vhd DCache.vhd ULA_control.vhd          \
-	IC_control.vhd DC_control.vhd
+	IC_control.vhd DC_control.vhd mul.vhd
 
 TARGETS += $(wildcard stages/*.vhd)
 TARGETS += $(wildcard pipes/*.vhd)
@@ -88,6 +88,12 @@ endif
 
 uc_test:
 	$(GHDL) -r $(GHDLFLAGS) UC_tb --stop-time=3us --vcd=$(WORKDIR)/$@.vcd
+ifeq ($(VISUAL), 1)
+	gtkwave $(WORKDIR)/$@.vcd
+endif
+
+multb:
+	$(GHDL) -r $(GHDLFLAGS) multb --stop-time=1us --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
